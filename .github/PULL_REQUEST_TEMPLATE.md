@@ -12,4 +12,4 @@ resolves #<number>
 Please provide link to other PRs that may be related (blocking, resolves, etc. etc.)
 
 ### People to notify
-cc: @redhat-cop/infra-ansible
+cc: @redhat-cop/tool-integrations
