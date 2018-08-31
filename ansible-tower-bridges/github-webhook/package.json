@@ -1,0 +1,18 @@
+{
+  "name": "github-webhook-bridge",
+  "version": "0.1.0",
+  "description": "GitHub Webhook Bridge for Ansible Tower",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Øystein Bedin",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "cors": "^2.7.1",
+    "express": "^4.14.0",
+    "request": "^2.85.0",
+    "url": "^0.11.0"
+  }
+}
