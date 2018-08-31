@@ -15,9 +15,11 @@ Running in OpenShift
 For example, use `oc new-app` to deploy the application:
 
 ```
-> oc new-app openshift/nodejs:8~https://github.com/tool-integrations.git --context-dir=ansible-tower-bridges/github-webhook
+> oc new-app openshift/nodejs:8~https://github.com/redhat-cop/tool-integrations.git --context-dir=ansible-tower-bridges/github-webhook
+> oc expose service tool-integrations
 ```
 
+Then add the environment variables below, and add a github webhook (with the `route` url) to test it out.
 
 Configuration
 -------------
