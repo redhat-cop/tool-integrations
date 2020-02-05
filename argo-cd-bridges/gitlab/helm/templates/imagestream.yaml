@@ -6,6 +6,6 @@ metadata:
   name: {{ include "launcher.fullname" . }}
 spec:
   lookupPolicy:
-    local: false
+    local: true
 status:
   dockerImageRepository: ""

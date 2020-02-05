@@ -10,7 +10,7 @@ spec:
       template:
         spec:
           containers:
-          - image: docker-registry.default.svc:5000/{{ .Release.Namespace }}/{{ include "launcher.fullname" . }}:latest
+          - image: {{ include "launcher.fullname" . }}:latest
             envFrom:
             - secretRef:
                 name: {{ include "launcher.fullname" . }}
