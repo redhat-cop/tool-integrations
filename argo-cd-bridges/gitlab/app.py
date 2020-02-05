@@ -94,7 +94,7 @@ def main() -> None:
                 SSH_SECRET_NAME=ssh_secret_name,
             )
             if "repositories" in config_map.data.keys():
-                config_map.data['repositories'] += repository_config
+                config_map.data['repositories'] += "\n" + repository_config
             else:
                 config_map.data['repositories'] = repository_config
             config_map_api.patch_namespaced_config_map(
