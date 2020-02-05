@@ -1,0 +1,38 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ include "launcher.fullname" . }}
+spec:
+  schedule: "{{ .Values.cron.schedule }}"
+  successfulJobsHistoryLimit: {{ .Values.cron.historyLimit }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - image: docker-registry.default.svc:5000/{{ .Release.Namespace }}/{{ include "launcher.fullname" . }}:latest
+            envFrom:
+            - secretRef:
+                name: {{ include "launcher.fullname" . }}
+            env:
+            - name: ARGO_NAMESPACE
+              value: {{ .Release.Namespace }}
+            - name: DESTINATION_NAMESPACE
+              value: {{ .Values.destinationNamespace }}
+            - name: RESOURCE_PREFIX
+              value: {{ .Values.resourcePrefix }}
+            - name: CHART_PATH
+              value: {{ .Values.chartPath }}
+            - name: SSH_SECRET_NAME
+              value: {{ .Values.sshSecretName }}
+            - name: ARGO_CONFIGMAP_NAME
+              value: {{ .Values.argoConfigMapName }}
+            imagePullPolicy: Always
+            name: {{ include "launcher.fullname" . }}
+            resources: {}
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+          restartPolicy: OnFailure
+          serviceAccount: {{ .Values.serviceAccount }}
+          serviceAccountName: {{ .Values.serviceAccount }}
+status: {}

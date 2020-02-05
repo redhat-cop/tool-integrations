@@ -1,0 +1,42 @@
+##############
+# Build params
+##############
+
+git:
+  url: https://github.com/jacobsee/tool-integrations.git
+  ref: master
+
+builderImage: python:3.6
+
+contextDir: /argo-cd-bridges/gitlab
+
+################
+# Runtime params
+################
+
+cron:
+  schedule: "*/5 * * * *"
+  historyLimit: 3
+
+gitLab:
+  apiUrl: https://gitlab.com
+  personalAccessToken: nothing-to-see-here
+  parentRepositoryID: some-number # All GitLab repos "under" this project id will be scanned
+
+# Where in the scanned repositories to find a Helm chart which should Argo should deploy
+chartPath: /
+
+# Created Applications will have the name "{{ resourcePrefix }}-{{ GitLab Repo ID }}". Not highly consequential but good for organization
+resourcePrefix: autodiscovered-app
+
+# A service account with permission to edit the Argo configmap and create Application resources
+serviceAccount: argocd-application-controller
+
+# The name of an SSH secret in the cluster which can pull the discovered repositories
+sshSecretName: your-secret-name
+
+# The name of the main Argo configmap, which I suppose could maybe vary under some circumstances
+argoConfigMapName: argocd-cm
+
+# The namespace you want Argo to deploy discovered Helm charts to (Application resources will always be created in the namespace Argo lives in)
+destinationNamespace: deploy-helm-charts-here
