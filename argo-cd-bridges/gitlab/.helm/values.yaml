@@ -3,7 +3,7 @@
 ##############
 
 git:
-  url: https://github.com/jacobsee/tool-integrations.git
+  url: https://github.com/redhat-cop/tool-integrations.git
   ref: master
 
 builderImage: python:3.6
