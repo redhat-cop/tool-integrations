@@ -30,17 +30,17 @@ The following configuration items tune and control the behavior of the applicati
 
 This application makes queries to the OpenShift API. The service account associated with the application must have sufficient rights to query for ImageStreams either at a cluster scope or namespace scope.
 
-The following command can be added to grant access to a service account at a cluster level using the included `registry-viewer` ClusterRole.
+The following command can be added to grant access to a service account at a cluster level using the included `registry-editor` ClusterRole.
 
 ```
-$ oc adm policy add-cluster-role-to-user registry-viewer -z <service-account>
+$ oc adm policy add-cluster-role-to-user registry-editor -z <service-account>
 ```
 
 To limit to a single namespace, the following command can be used:
 
 ```
 $ oc project <namespace>
-$ oc policy add-role-to-user registry-viewer -z <service-account>
+$ oc policy add-role-to-user registry-editor -z <service-account>
 ```
 
 ### Application Deployment
