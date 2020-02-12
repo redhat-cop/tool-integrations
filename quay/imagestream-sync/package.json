@@ -1,0 +1,18 @@
+{
+  "name": "quay-imagestream-sync",
+  "version": "0.1.0",
+  "description": "Synchronize ImageStreams with Quay Webhooks",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Andrew Block",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "cors": "^2.7.1",
+    "express": "^4.14.0",
+    "request": "^2.85.0",
+    "url": "^0.11.0"
+  }
+}
