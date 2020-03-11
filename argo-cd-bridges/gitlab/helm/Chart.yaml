@@ -1,4 +1,4 @@
-apiVersion: v2
+apiVersion: v1
 name: gitlab-argo-bridge
 description: A Helm chart which builds and deploys a CronJob that syncs GitLab projects (in a group) with an ArgoCD instance
 
