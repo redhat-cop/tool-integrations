@@ -1,0 +1,27 @@
+# Source: gitlab-argo-bridge/templates/cronjob.yaml
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: gitlab-argo-bridge
+spec:
+  schedule: "*/5 * * * *"
+  successfulJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - image: gitlab-argo-bridge:latest
+            envFrom:
+            - configMapRef:
+                name: gitlab-argo-bridge
+            - secretRef:
+                name: gitlab-argo-bridge
+            imagePullPolicy: Always
+            name: gitlab-argo-bridge
+            resources: {}
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+          restartPolicy: OnFailure
+          serviceAccount: argocd-application-controller
+          serviceAccountName: argocd-application-controller
