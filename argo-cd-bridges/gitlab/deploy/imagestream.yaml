@@ -1,0 +1,10 @@
+# Source: gitlab-argo-bridge/templates/imagestream.yaml
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  labels:
+    app: gitlab-argo-bridge
+  name: gitlab-argo-bridge
+spec:
+  lookupPolicy:
+    local: true
