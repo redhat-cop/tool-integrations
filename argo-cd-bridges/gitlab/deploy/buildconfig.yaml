@@ -32,3 +32,5 @@ spec:
   triggers:
   - type: ImageChange
   - type: ConfigChange
+status:
+  lastVersion: 0
