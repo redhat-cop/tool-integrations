@@ -15,6 +15,13 @@ resource_prefix = os.environ["RESOURCE_PREFIX"]
 ssh_secret_name = os.environ["SSH_SECRET_NAME"]
 chart_path = os.environ["CHART_PATH"]
 
+if "PROCESS_REPOSITORY_CONDITION" in os.environ:
+    use_process_repository_condition = True
+    process_repository_condition = os.environ["PROCESS_REPOSITORY_CONDITION"]
+else:
+    use_process_repository_condition = False
+    process_repository_condition = ""
+
 application_template = Template("""apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -40,12 +47,13 @@ repository_config_template = Template("""- name: {{ RESOURCE_PREFIX }}-{{ RESOUR
   url: {{ REPO_URL }}
 """)
 
+config.load_incluster_config()
+custom_object_api = client.CustomObjectsApi()
+config_map_api = client.CoreV1Api()
+
 
 def main() -> None:
     g = gitlab.Gitlab(gitlab_api_url, private_token=gitlab_token)
-    config.load_incluster_config()
-    custom_object_api = client.CustomObjectsApi()
-    config_map_api = client.CoreV1Api()
 
     current_applications_list = custom_object_api.list_namespaced_custom_object(
         group="argoproj.io",
@@ -57,54 +65,90 @@ def main() -> None:
 
     g.auth()
     group = g.groups.get(gitlab_group)
-    for project in group.projects.list(all=True, include_subgroups=True):
-        # Iterate through relevant GitLab projects
-        application = application_template.render(
-            RESOURCE_ID=project.id,
-            RESOURCE_PREFIX=resource_prefix,
-            CHART_PATH=chart_path,
-            REPO_URL=project.ssh_url_to_repo,
-            DESTINATION_NAMESPACE=destination_namespace,
-        )
-        application_data = yaml.load(application, Loader=yaml.FullLoader)
+    for group_project in group.projects.list(all=True, include_subgroups=True):
+        project = g.projects.get(group_project.id, lazy=False)
+        process_project(project, current_application_names)
 
-        # Check if we need to process this one or if it's already there
-        print(f"Checking for {application_data['metadata']['name']}")
-        if not application_data["metadata"]["name"] in current_application_names:
 
-            # Create Application object in OpenShift
-            print(f"Creating {application_data['metadata']['name']}")
-            custom_object_api.create_namespaced_custom_object(
-                group="argoproj.io",
-                version="v1alpha1",
-                namespace=argo_namespace,
-                plural="applications",
-                body=application_data,
-            )
+def process_project(project, current_application_names) -> None:
+    application = application_template.render(
+        RESOURCE_ID=project.id,
+        RESOURCE_PREFIX=resource_prefix,
+        CHART_PATH=chart_path,
+        REPO_URL=project.ssh_url_to_repo,
+        DESTINATION_NAMESPACE=destination_namespace,
+    )
+    application_data = yaml.load(application, Loader=yaml.FullLoader)
 
-            # Edit ConfigMap to link the repo to an SSH secret
-            config_map = config_map_api.read_namespaced_config_map(
-                name=argo_configmap_name,
-                namespace=argo_namespace,
-            )
-            repository_config = repository_config_template.render(
-                RESOURCE_ID=project.id,
-                RESOURCE_PREFIX=resource_prefix,
-                REPO_URL=project.ssh_url_to_repo,
-                SSH_SECRET_NAME=ssh_secret_name,
-            )
-            if "repositories" in config_map.data.keys():
-                config_map.data['repositories'] += "\n" + repository_config
-            else:
-                config_map.data['repositories'] = repository_config
-            config_map_api.patch_namespaced_config_map(
-                name=argo_configmap_name,
-                namespace=argo_namespace,
-                body=config_map,
-            )
+    # Check if we need to process this one
+    print(f"Checking if {application_data['metadata']['name']} should be processed")
+    if not application_data["metadata"]["name"] in current_application_names:
+        if use_process_repository_condition:
+            try:
+                # These functions are accessible within the scope of `PROCESS_REPOSITORY_CONDITION`
 
+                def exists(filename, branch="master"):
+                    try:
+                        project.files.get(file_path=filename, ref=branch)
+                        return True
+                    except:
+                        return False
+
+                def contains(filename, string, branch="master"):
+                    try:
+                        file = project.files.get(file_path=filename, ref=branch)
+                        return string in str(file.decode())
+                    except:
+                        return False
+
+                scope = locals()
+                should_process = eval(process_repository_condition, scope)
+
+            except:
+                print(f"Condition check for {application_data['metadata']['name']} resulted in an error (might be expected)")
+                should_process = False
         else:
-            print(f"Found existing {application_data['metadata']['name']}, skipping")
+            should_process = True
+
+        if should_process:
+            print(f"Adding {application_data['metadata']['name']}")
+            add_application_to_argo(project, application_data)
+        else:
+            print(f"Not processing {application_data['metadata']['name']} because the condition check did not pass")
+    else:
+        print(f"Will not process {application_data['metadata']['name']} because it already exists")
+
+
+def add_application_to_argo(project, application_data) -> None:
+    # Create Application object in OpenShift
+    custom_object_api.create_namespaced_custom_object(
+        group="argoproj.io",
+        version="v1alpha1",
+        namespace=argo_namespace,
+        plural="applications",
+        body=application_data,
+    )
+
+    # Edit ConfigMap to link the repo to an SSH secret
+    config_map = config_map_api.read_namespaced_config_map(
+        name=argo_configmap_name,
+        namespace=argo_namespace,
+    )
+    repository_config = repository_config_template.render(
+        RESOURCE_ID=project.id,
+        RESOURCE_PREFIX=resource_prefix,
+        REPO_URL=project.ssh_url_to_repo,
+        SSH_SECRET_NAME=ssh_secret_name,
+    )
+    if "repositories" in config_map.data.keys():
+        config_map.data['repositories'] += "\n" + repository_config
+    else:
+        config_map.data['repositories'] = repository_config
+    config_map_api.patch_namespaced_config_map(
+        name=argo_configmap_name,
+        namespace=argo_namespace,
+        body=config_map,
+    )
 
 
 main()

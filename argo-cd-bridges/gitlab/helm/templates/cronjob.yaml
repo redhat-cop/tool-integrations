@@ -27,6 +27,10 @@ spec:
               value: {{ .Values.sshSecretName }}
             - name: ARGO_CONFIGMAP_NAME
               value: {{ .Values.argoConfigMapName }}
+            {{- if .Values.processRepositoryCondition }}
+            - name: PROCESS_REPOSITORY_CONDITION
+              value: {{ .Values.processRepositoryCondition | quote }}
+            {{- end }}
             imagePullPolicy: Always
             name: {{ include "launcher.fullname" . }}
             resources: {}
