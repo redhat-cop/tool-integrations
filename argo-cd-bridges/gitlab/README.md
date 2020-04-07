@@ -8,7 +8,7 @@ It is deployable using Helm 3, and all options can be seen in the chart's [value
 
 ## Conditional Processing
 
-The app supports an optional parameter `processRepositoryCondition`, which, when populated, runs an additional check against each repo that must pass before it will be added to Argo CD. This parameter is expected to be a valid Python expression, and the following two special functions returning boolean values are available to it:
+The app supports an optional parameter `processRepositoryCondition` (environment variable `PROCESS_REPOSITORY_CONDITION`), which, when populated, runs an additional check against each repo that must pass before it will be added to Argo CD. This parameter is expected to be a valid Python expression, and the following two special functions returning boolean values are available to it:
 
 * `exists(filename, branch="master")`
 * `contains(filename, string, branch="master")`
