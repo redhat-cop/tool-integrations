@@ -22,6 +22,10 @@ Some example values for `processRepositoryCondition` are:
 
 Note that any errors encountered while processing the expression are considered the same as if it had evaluated false.
 
+## Plugins
+
+This app supports arbitrary plugins for performing preprocessing on GitLab projects before adding them to Argo. If the environment variable `PLUGIN_DIRECTORY` is set, the directory will be scanned for Python files. Each Python file found in this directory is considered a single plugin, and should define a function with the signature `plugin(project) -> bool`. This is the plugin's entrypoint. It receives a parameter `project` of type `gitlab.v4.objects.Project` which is documented [here](https://python-gitlab.readthedocs.io/en/stable/gl_objects/projects.html#reference). It should return a boolean value, indicating whether the project should be added to Argo or not. If any plugin returns false - the project is 'rejected' and not added to Argo. An example plugin file can be found in [plugins/example.py](plugins/example.py).
+
 ## Typical Deployment
 
 ```sh

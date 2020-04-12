@@ -55,22 +55,21 @@ repository_config_template = Template("""- name: {{ RESOURCE_PREFIX }}-{{ RESOUR
   url: {{ REPO_URL }}
 """)
 
-# config.load_incluster_config()
-# custom_object_api = client.CustomObjectsApi()
-# config_map_api = client.CoreV1Api()
+config.load_incluster_config()
+custom_object_api = client.CustomObjectsApi()
+config_map_api = client.CoreV1Api()
 
 
 def main() -> None:
     g = gitlab.Gitlab(gitlab_api_url, private_token=gitlab_token)
 
-    # current_applications_list = custom_object_api.list_namespaced_custom_object(
-    #     group="argoproj.io",
-    #     version="v1alpha1",
-    #     namespace=argo_namespace,
-    #     plural="applications",
-    # )
-    # current_application_names = list(map(lambda item: item["metadata"]["name"], current_applications_list["items"]))
-    current_application_names = []
+    current_applications_list = custom_object_api.list_namespaced_custom_object(
+        group="argoproj.io",
+        version="v1alpha1",
+        namespace=argo_namespace,
+        plural="applications",
+    )
+    current_application_names = list(map(lambda item: item["metadata"]["name"], current_applications_list["items"]))
 
     g.auth()
     group = g.groups.get(gitlab_group)
@@ -121,7 +120,7 @@ def process_project(project, current_application_names) -> None:
 
         # Process plugins if everything looks good so far
         if should_process and use_plugins:
-            plugin_files = [f for f in os.listdir(plugin_directory) if os.path.isfile(os.path.join(plugin_directory, f))]
+            plugin_files = [f for f in os.listdir(plugin_directory) if os.path.isfile(os.path.join(plugin_directory, f)) and f.endswith(".py")]
             for file in plugin_files:
                 try:
                     spec = importlib.util.spec_from_file_location(f"loaded_plugin_{file}",
