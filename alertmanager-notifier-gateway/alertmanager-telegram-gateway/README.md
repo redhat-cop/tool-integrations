@@ -67,5 +67,5 @@ bot902xxxx:AAHzxxxxxxxxx
 ```
 
 
-<img src="/alertmanager-notifier-gateway/alertmanager-line-gateway/artefacts/line2.png">
-<img src="/alertmanager-notifier-gateway/alertmanager-line-gateway/artefacts/line_rcv.jpg" width="250">
+<img src="/alertmanager-notifier-gateway/alertmanager-telegram-gateway/artefacts/telegram.png">
+<img src="/alertmanager-notifier-gateway/alertmanager-telegram-gateway/artefacts/telegram_rcv.jpg" width="250">
