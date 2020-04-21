@@ -13,6 +13,6 @@ ENV GOCACHE=/go/src/github.com/redhat-cop/alertmanager-telegram-gateway
 RUN go get
 RUN go build
 
-EXPOSE 8080
+EXPOSE 8080 8443
 
 CMD ["./alertmanager-telegram-gateway"]
