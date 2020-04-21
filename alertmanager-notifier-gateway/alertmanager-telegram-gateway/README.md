@@ -29,7 +29,7 @@ Hence, your API Token is the "BOT_TOKEN" and Chat ID is "id".
 
 #oc new-app telegram-notify-gateway
 
-#oc set env dc telegram-notify-gateway chat_id=<Chat ID>
+#oc set env dc telegram-notify-gateway ChatID=<Chat ID>
 
 #oc set probe dc/telegram-notify-gateway --readiness --get-url=http://:8080/healthz
 
