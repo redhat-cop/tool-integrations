@@ -161,7 +161,7 @@ func healthz(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//All the magics starts here
+//All the magic starts here
 func main() {
 
 	http.HandleFunc("/healthz", healthz)
