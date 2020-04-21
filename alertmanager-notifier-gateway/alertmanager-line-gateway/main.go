@@ -161,10 +161,6 @@ func healthz(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-<<<<<<< HEAD
-//All the magics starts here
-=======
->>>>>>> c2548af910cbe01cd914895078d74ccd755a26a4
 //All the magic starts here
 func main() {
 
