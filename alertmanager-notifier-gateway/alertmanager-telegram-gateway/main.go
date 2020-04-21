@@ -55,10 +55,6 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 		cid := os.Getenv("ChatID")
 		if cid == "" {
 			log.Fatal("ChatID environment setting not found!")
-		} else {
-			log.WithFields(log.Fields{
-				"Telegram ChatID": cid,
-			}).Info("ChatID found.")
 		}
 
 		//Parse the request body and load into payload struct template.
