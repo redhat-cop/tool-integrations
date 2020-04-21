@@ -27,6 +27,11 @@ Hence, your API Token is the "BOT_TOKEN" and Chat ID is "id".
 ```
 #oc new-build --name=telegram-notify-gateway golang~https://github.com/redhat-cop/tool-integrations#master --context-dir=alertmanager-notifier-gateway/alertmanager-telegram-gateway
 
+
+```
+
+# Deploying application with non-TLS
+```
 #oc new-app telegram-notify-gateway
 
 #oc set env dc telegram-notify-gateway ChatID=<Chat ID>
@@ -42,6 +47,28 @@ telegram-notify-gateway   ClusterIP   172.30.122.21   <none>        8080/TCP   4
 
 ```
 
+# Deploying application with TLS
+```
+#oc new-app telegram-notify-gateway
+
+#oc set env dc telegram-notify-gateway ChatID=<Chat ID> insecure=false tlscert=/var/lib/secrets/tls.crt tlskey=/var/lib/secrets/tls.key
+
+#oc set probe dc/telegram-notify-gateway --readiness --get-url=http://:8443/healthz
+
+#oc set volume dc/telegram-notify-gateway --add --name=secrets -t secret  --secret-name=telegram-notify --mount-path=/var/lib/secrets --overwrite
+
+#oc expose dc/telegram-notify-gateway --port=8443
+service/telegam-notify-gateway exposed
+
+#oc get svc
+NAME                  TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+telegram-notify-gateway   ClusterIP   172.30.122.21   <none>        8443/TCP   4s
+
+# oc annotate service telegram-notify-gateway service.beta.openshift.io/serving-cert-secret-name=telegram-notify
+
+NOTE: Once secret generated, restart pod.
+
+```
 
 ## Usage ##
 
@@ -55,11 +82,14 @@ Set receiver of generic webhook from Alertmanager.
 "receivers":
   - "name": "team-telegram"
     "webhook_configs":
-    - "url": "<http://telegram-notify-gateway-service-url>:8080/webhook"
+    - "url": "<http(s)://telegram-notify-gateway-service-url>:(8080|8443)/webhook"
       "http_config":
          "basic_auth":
             "username" : "bot902xxxx"
             "password" : "AAHzxxxxxxxxx"
+          "tls_config":
+            "insecure_skip_verify": true
+            
 ```
 NOTE: The basic_auth are coming from auth token that has been splitted. E.g
 ```

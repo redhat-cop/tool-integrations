@@ -166,9 +166,25 @@ func main() {
 	http.HandleFunc("/webhook", webhook)
 	log.Info("Initialized /webhook handler")
 
-	log.Info("Serving at 0.0.0.0:8080")
-	err := http.ListenAndServe(":8080", nil)
-	if err != nil {
-		log.Fatal(err)
+	if os.Getenv("insecure") == "false" {
+		if os.Getenv("tlscert") == "" {
+			log.Fatal("Missing TLS cert as tlscert env.")
+		}
+
+		if os.Getenv("tlskey") == "" {
+			log.Fatal("Missing TLS key tlskey env.")
+		}
+
+		log.Info("Serving TLS at 0.0.0.0:8443")
+		err := http.ListenAndServeTLS(":8443", os.Getenv("tlscert"), os.Getenv("tlskey"), nil)
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		log.Info("Serving at 0.0.0.0:8080")
+		err := http.ListenAndServe(":8080", nil)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }
