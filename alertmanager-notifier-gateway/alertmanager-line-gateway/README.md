@@ -10,17 +10,6 @@ Line Notification Gateway for OpenShift Prometheus Alertmanager.
 ```
 #oc new-build --name=line-notify-gateway golang~https://github.com/redhat-cop/tool-integrations#master --context-dir=alertmanager-notifier-gateway/alertmanager-line-gateway
 
-#oc new-app line-notify-gateway
-
-#oc set probe dc/line-notify-gateway --readiness --get-url=http://:8080/healthz
-
-#oc expose dc/line-notify-gateway --port=8080
-service/line-notify-gateway exposed
-
-#oc get svc
-NAME                  TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
-line-notify-gateway   ClusterIP   172.30.122.39   <none>        8080/TCP   4s
-
 ```
 
 
@@ -48,7 +37,7 @@ line-notify-gateway   ClusterIP   172.30.122.39   <none>        8080/TCP   4s
 ```
 #oc new-app line-notify-gateway
 
-#oc set probe dc/line-notify-gateway --readiness --get-url=http://:8443/healthz
+#oc set probe dc/line-notify-gateway --readiness --get-url=https://:8443/healthz
 
 #oc set env dc line-notify-gateway insecure=false tlscert=/var/lib/tlssecrets/tls.crt tlskey=/var/lib/tlssecrets/tls.key
 
