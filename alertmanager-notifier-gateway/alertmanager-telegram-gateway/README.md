@@ -51,11 +51,11 @@ telegram-notify-gateway   ClusterIP   172.30.122.21   <none>        8080/TCP   4
 ```
 #oc new-app telegram-notify-gateway
 
-#oc set env dc telegram-notify-gateway ChatID=<Chat ID> insecure=false tlscert=/var/lib/secrets/tls.crt tlskey=/var/lib/secrets/tls.key
+#oc set env dc telegram-notify-gateway ChatID=<Chat ID> insecure=false tlscert=/var/lib/tlssecrets/tls.crt tlskey=/var/lib/tlssecrets/tls.key
 
 #oc set probe dc/telegram-notify-gateway --readiness --get-url=http://:8443/healthz
 
-#oc set volume dc/telegram-notify-gateway --add --name=secrets -t secret  --secret-name=telegram-notify --mount-path=/var/lib/secrets --overwrite
+#oc set volume dc/telegram-notify-gateway --add --name=tlssecrets -t secret  --secret-name=telegram-notify-tls --mount-path=/var/lib/tlssecrets --overwrite
 
 #oc expose dc/telegram-notify-gateway --port=8443
 service/telegam-notify-gateway exposed
@@ -64,7 +64,7 @@ service/telegam-notify-gateway exposed
 NAME                  TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
 telegram-notify-gateway   ClusterIP   172.30.122.21   <none>        8443/TCP   4s
 
-# oc annotate service telegram-notify-gateway service.beta.openshift.io/serving-cert-secret-name=telegram-notify
+# oc annotate service telegram-notify-gateway service.beta.openshift.io/serving-cert-secret-name=telegram-notify-tls
 
 NOTE: Once secret generated, restart pod.
 

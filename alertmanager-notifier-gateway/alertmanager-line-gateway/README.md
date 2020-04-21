@@ -50,9 +50,9 @@ line-notify-gateway   ClusterIP   172.30.122.39   <none>        8080/TCP   4s
 
 #oc set probe dc/line-notify-gateway --readiness --get-url=http://:8443/healthz
 
-#oc set env dc line-notify-gateway insecure=false tlscert=/var/lib/secrets/tls.crt tlskey=/var/lib/secrets/tls.key
+#oc set env dc line-notify-gateway insecure=false tlscert=/var/lib/tlssecrets/tls.crt tlskey=/var/lib/tlssecrets/tls.key
 
-#oc set volume dc/line-notify-gateway --add --name=secrets -t secret  --secret-name=line-notify --mount-path=/var/lib/secrets --overwrite
+#oc set volume dc/line-notify-gateway --add --name=tlssecrets -t secret  --secret-name=line-notify-tls --mount-path=/var/lib/tlssecrets --overwrite
 
 #oc expose dc/line-notify-gateway --port=8443
 service/line-notify-gateway exposed
@@ -61,7 +61,7 @@ service/line-notify-gateway exposed
 NAME                  TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
 line-notify-gateway   ClusterIP   172.30.112.45   <none>        8443/TCP   23s
 
-# oc annotate service line-notify-gateway service.beta.openshift.io/serving-cert-secret-name=line-notify
+# oc annotate service line-notify-gateway service.beta.openshift.io/serving-cert-secret-name=line-notify-tls
 
 NOTE: Once secret generated, restart pod.
 ```
