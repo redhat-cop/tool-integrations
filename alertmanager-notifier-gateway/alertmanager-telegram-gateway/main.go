@@ -1,5 +1,5 @@
 /*
-Comments: Implemented based on https://notify-bot.line.me/doc/en/.
+Comments: Implemented based on https://core.telegram.org/bots.
 */
 package main
 
