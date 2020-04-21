@@ -3,6 +3,7 @@ import yaml
 from kubernetes import client, config
 from jinja2 import Template
 import os
+import importlib.util
 
 gitlab_api_url = os.environ["GITLAB_API_URL"]
 gitlab_token = os.environ["GITLAB_PERSONAL_ACCESS_TOKEN"]
@@ -21,6 +22,13 @@ if "PROCESS_REPOSITORY_CONDITION" in os.environ:
 else:
     use_process_repository_condition = False
     process_repository_condition = ""
+
+if "PLUGIN_DIRECTORY" in os.environ:
+    use_plugins = True
+    plugin_directory = os.environ["PLUGIN_DIRECTORY"]
+else:
+    use_plugins = False
+    plugin_directory = ""
 
 application_template = Template("""apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -80,9 +88,9 @@ def process_project(project, current_application_names) -> None:
     )
     application_data = yaml.load(application, Loader=yaml.FullLoader)
 
-    # Check if we need to process this one
     print(f"Checking if {application_data['metadata']['name']} should be processed")
     if not application_data["metadata"]["name"] in current_application_names:
+        # Check the conditional processing logic (if it exists)
         if use_process_repository_condition:
             try:
                 # These functions are accessible within the scope of `PROCESS_REPOSITORY_CONDITION`
@@ -104,19 +112,38 @@ def process_project(project, current_application_names) -> None:
                 scope = locals()
                 should_process = eval(process_repository_condition, scope)
 
-            except:
-                print(f"Condition check for {application_data['metadata']['name']} resulted in an error (might be expected)")
+            except Exception as e:
+                print(f"Condition check for {application_data['metadata']['name']} resulted in an error (might be expected):", repr(e))
                 should_process = False
         else:
             should_process = True
 
+        # Process plugins if everything looks good so far
+        if should_process and use_plugins:
+            plugin_files = [f for f in os.listdir(plugin_directory) if os.path.isfile(os.path.join(plugin_directory, f)) and f.endswith(".py")]
+            for file in plugin_files:
+                try:
+                    spec = importlib.util.spec_from_file_location(f"loaded_plugin_{file}",
+                                                                  os.path.join(plugin_directory, file))
+                    module = importlib.util.module_from_spec(spec)
+                    spec.loader.exec_module(module)
+                    plugin_processing_succeeded = module.plugin(project)
+                except Exception as e:
+                    print(f"Not processing {application_data['metadata']['name']} because plugin {file} threw an error:", repr(e))
+                    plugin_processing_succeeded = False
+                    should_process = False
+                if not plugin_processing_succeeded:
+                    print(f"Not processing {application_data['metadata']['name']} because plugin {file} rejected it")
+                    should_process = False
+
+        # Done with all of our preprocessing... How does it look?
         if should_process:
-            print(f"Adding {application_data['metadata']['name']}")
+            print(f"Processing {application_data['metadata']['name']}")
             add_application_to_argo(project, application_data)
         else:
-            print(f"Not processing {application_data['metadata']['name']} because the condition check did not pass")
+            print(f"Not processing {application_data['metadata']['name']} because all preconditions did not pass")
     else:
-        print(f"Will not process {application_data['metadata']['name']} because it already exists")
+        print(f"Not processing {application_data['metadata']['name']} because it already exists")
 
 
 def add_application_to_argo(project, application_data) -> None:
