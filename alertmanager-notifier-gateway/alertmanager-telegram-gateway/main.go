@@ -84,6 +84,7 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 			postData.Set("text", resp)
 			postData.Set("chat_id", cid)
 
+			// It looks like this https://api/bot_token/sendMessage
 			tg := telegramAPIUrl + "/" + a + "/sendMessage"
 
 			//Create new HTTP Post, and post data with proper authorization and Content-Type header.
@@ -160,7 +161,7 @@ func healthz(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//All the magics starts here
+//All the magic starts here
 func main() {
 
 	http.HandleFunc("/healthz", healthz)
