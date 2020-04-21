@@ -25,7 +25,7 @@ Hence, your API Token is the "BOT_TOKEN" and Chat ID is "id".
 # S2I Stategy build
 
 ```
-#oc new-build --name=line-notify-gateway golang~https://github.com/redhat-cop/tool-integrations#master --context-dir=alertmanager-notifier-gateway/alertmanager-telegram-gateway
+#oc new-build --name=telegram-notify-gateway golang~https://github.com/redhat-cop/tool-integrations#master --context-dir=alertmanager-notifier-gateway/alertmanager-telegram-gateway
 
 #oc new-app telegram-notify-gateway
 
