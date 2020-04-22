@@ -42,7 +42,7 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 	b64t := strings.Split(ah, " ")[1]
 	ab, err := base64.StdEncoding.DecodeString(b64t)
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err)
 	}
 	a := string(ab)
 
@@ -54,7 +54,7 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 		//Telegram Bot ChatID declaration
 		cid := os.Getenv("ChatID")
 		if cid == "" {
-			log.Fatal("ChatID environment setting not found!")
+			log.Error("ChatID environment setting not found!")
 		}
 
 		//Parse the request body and load into payload struct template.
@@ -88,7 +88,7 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 			request, err := http.NewRequest("POST", tg, bytes.NewBufferString(postData.Encode()))
 			request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 			if err != nil {
-				log.Fatal(err)
+				log.Error(err)
 			}
 
 			defer request.Body.Close()
@@ -102,7 +102,7 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 
 			s, err := client.Do(request)
 			if err != nil {
-				log.Fatal(err)
+				log.Error(err)
 			}
 
 			log.WithFields(log.Fields{
