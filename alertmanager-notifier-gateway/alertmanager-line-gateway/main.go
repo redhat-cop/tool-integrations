@@ -86,7 +86,7 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 			request.Header.Add("Authorization", a)
 			request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 			if err != nil {
-				log.Fatal(err)
+				log.Error(err)
 			}
 			defer request.Body.Close()
 
@@ -100,12 +100,12 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 			//Now make the POST call.
 			s, err := client.Do(request)
 			if err != nil {
-				log.Fatal(err)
+				log.Error(err)
 			}
 
 			body, err := ioutil.ReadAll(s.Body)
 			if err != nil {
-				log.Fatal(err)
+				log.Error(err)
 			}
 
 			msgbody := new(rbody)
