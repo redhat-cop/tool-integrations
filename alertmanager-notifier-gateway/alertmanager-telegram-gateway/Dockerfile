@@ -1,5 +1,4 @@
-
-FROM golang:1.13
+FROM docker.io/library/golang:1.14
 
 USER 1001
 
