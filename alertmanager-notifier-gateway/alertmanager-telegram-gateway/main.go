@@ -66,6 +66,7 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "HTTP Bad Request: Unable to parse received payload", http.StatusBadRequest)
 			return
 		}
+
 		for _, alert := range payload.Alerts {
 
 			//Extract required info and assigned each var
@@ -191,12 +192,13 @@ func main() {
 		}
 		
 	} else {
+		
 		//Run the server in non-TLS mode
 		log.Info("Serving at 0.0.0.0:8080")
 		err := http.ListenAndServe(":8080", nil)
-
 		if err != nil {
 			log.Fatal(err)
 		}
+
 	}
 }
