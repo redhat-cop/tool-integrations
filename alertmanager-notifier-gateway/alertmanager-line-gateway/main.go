@@ -4,6 +4,7 @@ Comments: Implemented based on https://notify-bot.line.me/doc/en/.
 package main
 
 import (
+	"fmt"
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
@@ -73,8 +74,8 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 			am := alert.Annotations["message"]
 			sl := alert.Labels["severity"]
 
-			//Build up a data string
-			resp := "AlertName=" + ls + "\nSeverity=" + sl + "\nAlertStartsAt=" + at + "\nAlertStatus=" + as + "\nAlertMessage=" + am
+			//Build up a response data string from the alert received from alertmanager webhook payload.
+			resp := fmt.Sprintf("AlertName=%s\n Severity=%s\n AlertStartAt=%s\n AlertStatus=%s\n AlertMessage=%s\n", ls, sl, at, as, am)
 
 			//Create a value data that server will understand to be posted.
 			postData := url.Values{}
@@ -170,7 +171,9 @@ func main() {
 	http.HandleFunc("/webhook", webhook)
 	log.Info("Initialized /webhook handler")
 
+	// Check for environment settings for TLS or non-TLS startup.
 	if os.Getenv("insecure") == "false" {
+
 		if os.Getenv("tlscert") == "" {
 			log.Fatal("Missing TLS cert as tlscert env.")
 		}
@@ -179,16 +182,20 @@ func main() {
 			log.Fatal("Missing TLS key tlskey env.")
 		}
 
+		// Run the server in TLS mode with certificate and key location from enviroment settings.
 		log.Info("Serving TLS at 0.0.0.0:8443")
 		err := http.ListenAndServeTLS(":8443", os.Getenv("tlscert"), os.Getenv("tlskey"), nil)
 		if err != nil {
 			log.Fatal(err)
 		}
+		
 	} else {
+
 		log.Info("Serving at 0.0.0.0:8080")
 		err := http.ListenAndServe(":8080", nil)
 		if err != nil {
 			log.Fatal(err)
 		}
+
 	}
 }

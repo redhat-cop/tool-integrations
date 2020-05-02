@@ -1,14 +1,11 @@
-FROM docker.io/library/golang:1.14
+FROM registry.access.redhat.com/ubi8/go-toolset:latest
 
 USER 1001
 
-RUN mkdir -p /go/src/github.com/redhat-cop/alertmanager-telegram-gateway
-WORKDIR /go/src/github.com/redhat-cop/alertmanager-telegram-gateway
+WORKDIR /opt/app-root/src
 
-COPY . /go/src/github.com/redhat-cop/alertmanager-telegram-gateway
-ENV GOCACHE=on
-ENV GO111MODULE=off
-ENV GOCACHE=/go/src/github.com/redhat-cop/alertmanager-telegram-gateway
+COPY  . /opt/app-root/src
+
 RUN go get
 RUN go build
 
