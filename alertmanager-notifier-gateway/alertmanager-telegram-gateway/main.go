@@ -4,6 +4,7 @@ Comments: Implemented based on https://core.telegram.org/bots.
 package main
 
 import (
+	"fmt"
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
@@ -32,6 +33,8 @@ func init() {
 func webhook(w http.ResponseWriter, r *http.Request) {
 	//Defer the Close() method until this function return.
 	defer r.Body.Close()
+
+	// read POST request information.
 	radd := r.RemoteAddr
 	rmtd := r.Method
 	ruri := r.RequestURI
@@ -46,9 +49,10 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 	}
 	a := string(ab)
 
+	// Validate which HTTP method being use, and continue processing based on it.
 	switch r.Method {
 	case "POST":
-		//Initialized empty payload struct from alertmanager template Data struct.
+
 		payload := template.Data{}
 
 		//Telegram Bot ChatID declaration
@@ -63,7 +67,7 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		for _, alert := range payload.Alerts {
-			//fmt.Println(alert)
+
 			//Extract required info and assigned each var
 			ls := alert.Labels["alertname"]
 			fp := alert.Fingerprint
@@ -72,18 +76,16 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 			am := alert.Annotations["message"]
 			sl := alert.Labels["severity"]
 
-			//Build up a data string
-			resp := "AlertName=" + ls + "\nSeverity=" + sl + "\nAlertStartsAt=" + at + "\nAlertStatus=" + as + "\nAlertMessage=" + am
+			//Build up a response data string from the alert received from alertmanager webhook payload.
+			resp := fmt.Sprintf("AlertName=%s\n Severity=%s\n AlertStartAt=%s\n AlertStatus=%s\n AlertMessage=%s\n", ls, sl, at, as, am)
 
 			//Create a value data that server will understand to be posted.
 			postData := url.Values{}
 			postData.Set("text", resp)
 			postData.Set("chat_id", cid)
 
-			// It looks like this https://api/bot_token/sendMessage
-			tg := telegramAPIUrl + "/" + a + "/sendMessage"
-
 			//Create new HTTP Post, and post data with proper authorization and Content-Type header.
+			tg := fmt.Sprintf("%s/%s/sendMessage", telegramAPIUrl, a) // https://api_url/bot_token/sendMessage
 			client := &http.Client{}
 			request, err := http.NewRequest("POST", tg, bytes.NewBufferString(postData.Encode()))
 			request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -91,6 +93,7 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 				log.Error(err)
 			}
 
+			// Defer close of the request until this function return.
 			defer request.Body.Close()
 
 			log.WithFields(log.Fields{
@@ -100,6 +103,7 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 				"RemoteHTTPUrl":    telegramAPIUrl,
 			}).Info("Posting message.")
 
+			// Do the POST call to server
 			s, err := client.Do(request)
 			if err != nil {
 				log.Error(err)
@@ -111,7 +115,7 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 			}).Info("Response received.")
 			return
 		}
-
+	//only handle POST, else error.
 	default:
 		http.Error(w, "Method not Allowed", http.StatusMethodNotAllowed)
 		log.WithFields(log.Fields{
@@ -126,7 +130,7 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//Implement a handler for healthz
+//Implement a simple handler for healthz endpoint
 func healthz(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
@@ -139,12 +143,14 @@ func healthz(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Not Found", http.StatusNotFound)
 		return
 	}
-	switch r.Method {
 
+	// Validate which HTTP method being use, and continue processing based on it.
+	switch r.Method {
 	case "GET":
 		w.Write([]byte("I`m ready\n"))
 		return
 
+	//only handle GET, else error.
 	default:
 		http.Error(w, "Method not Allowed", http.StatusMethodNotAllowed)
 		log.WithFields(log.Fields{
@@ -166,7 +172,9 @@ func main() {
 	http.HandleFunc("/webhook", webhook)
 	log.Info("Initialized /webhook handler")
 
+	// Check for environment settings for TLS or non-TLS startup.
 	if os.Getenv("insecure") == "false" {
+
 		if os.Getenv("tlscert") == "" {
 			log.Fatal("Missing TLS cert as tlscert env.")
 		}
@@ -175,14 +183,18 @@ func main() {
 			log.Fatal("Missing TLS key tlskey env.")
 		}
 
+		// Run the server in TLS mode with certificate and key location from enviroment settings.
 		log.Info("Serving TLS at 0.0.0.0:8443")
 		err := http.ListenAndServeTLS(":8443", os.Getenv("tlscert"), os.Getenv("tlskey"), nil)
 		if err != nil {
 			log.Fatal(err)
 		}
+		
 	} else {
+		//Run the server in non-TLS mode
 		log.Info("Serving at 0.0.0.0:8080")
 		err := http.ListenAndServe(":8080", nil)
+
 		if err != nil {
 			log.Fatal(err)
 		}
