@@ -4,11 +4,6 @@ Telegram Notification Gateway for OpenShift Prometheus Alertmanager.
 
 ## Installation ##
 
-# Prebuilt image  
-```
-https://quay.io/repository/redhat/alertmanager-telegram-gateway?tab=tags
-```  
-
 # Pre-req
 To send alert to Telegram we need below items:  
 a. API Token  
