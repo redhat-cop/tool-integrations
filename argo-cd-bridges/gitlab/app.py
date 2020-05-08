@@ -30,10 +30,7 @@ else:
     use_plugins = False
     plugin_directory = ""
 
-if "ADD_KEY_BY_GITLAB_GROUP" in os.environ and os.environ["ADD_KEY_BY_GITLAB_GROUP"] == "true":
-    add_by_gitlab_group = True
-else:
-    add_by_gitlab_group = False
+add_by_gitlab_group = "ADD_KEY_BY_GITLAB_GROUP" in os.environ and os.environ["ADD_KEY_BY_GITLAB_GROUP"] == "true"
 gitlab_group_url = ""
 
 application_template = Template("""apiVersion: argoproj.io/v1alpha1
