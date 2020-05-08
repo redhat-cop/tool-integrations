@@ -27,6 +27,8 @@ spec:
               value: {{ .Values.sshSecretName }}
             - name: ARGO_CONFIGMAP_NAME
               value: {{ .Values.argoConfigMapName }}
+            - name: ADD_KEY_BY_GITLAB_GROUP
+              value: {{ .Values.addKeyByGitLabGroup }}
             {{- if .Values.processRepositoryCondition }}
             - name: PROCESS_REPOSITORY_CONDITION
               value: {{ .Values.processRepositoryCondition | quote }}
