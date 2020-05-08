@@ -184,7 +184,8 @@ def add_application_to_argo(project, application_data) -> None:
             SSH_SECRET_NAME=ssh_secret_name,
         )
         if "repository.credentials" in config_map.data.keys():
-            entry_exists = [element for element in config_map.data["repository.credentials"] if element["url"] == gitlab_group_url]
+            existing_credentials = yaml.load(config_map.data["repository.credentials"])
+            entry_exists = [element for element in existing_credentials if element["url"] == gitlab_group_url]
             if len(entry_exists) == 0:
                 # Need to add group config
                 config_map.data["repository.credentials"] += "\n" + group_config
