@@ -178,7 +178,7 @@ def add_application_to_argo(project, application_data) -> None:
         namespace=argo_namespace,
     )
     if add_by_gitlab_group:
-        config_map_modification = ""
+        modify_config_map = False
         group_config = group_config_template.render(
             GROUP_URL=gitlab_group_url,
             SSH_SECRET_NAME=ssh_secret_name,
@@ -187,15 +187,16 @@ def add_application_to_argo(project, application_data) -> None:
             entry_exists = [element for element in config_map.data["repository.credentials"] if element["url"] == gitlab_group_url]
             if len(entry_exists) == 0:
                 # Need to add group config
-                config_map_modification = "\n" + group_config
+                config_map.data["repository.credentials"] += "\n" + group_config
+                modify_config_map = True
             else:
                 print("Not modifying Argo config - group credential already exists")
         else:
             # Need to add config key in the first place
-            config_map_modification = group_config
-        if len(config_map_modification) > 0:
+            config_map.data["repository.credentials"] = group_config
+            modify_config_map = True
+        if modify_config_map:
             # Need to update the configmap with changes
-            config_map.data["repository.credentials"] += config_map_modification
             config_map_api.patch_namespaced_config_map(
                 name=argo_configmap_name,
                 namespace=argo_namespace,
