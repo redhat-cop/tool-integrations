@@ -67,7 +67,21 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		//Enable debug 
+		if os.Getenv("debug") == "true" {
+			log.WithFields(log.Fields{
+				"Total Payload": payload.Alerts,
+			}).Info("Debug")
+		}
+
 		for _, alert := range payload.Alerts {
+
+			//Enable debug
+			if os.Getenv("debug") == "true" {
+				log.WithFields(log.Fields{
+					"Processed Payload": alert,
+				}).Info("Debug")
+			}
 
 			//Extract required info and assigned each var
 			ls := alert.Labels["alertname"]
@@ -114,7 +128,6 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 				"ServerHTTPUrl":      telegramAPIUrl,
 				"ServerHTTPResponse": s.StatusCode,
 			}).Info("Response received.")
-			return
 		}
 	//only handle POST, else error.
 	default:
