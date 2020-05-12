@@ -63,9 +63,23 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 		//Read Authorization from alertmanager POST header to be reused.
 		a := r.Header.Get("Authorization")
 
-		//Iterate all alerts in the payload, process and POST it to Line messenger.
+		//Enable debug 
+		if os.Getenv("debug") == "true" {
+			log.WithFields(log.Fields{
+				"Total Payload": payload.Alerts,
+			}).Info("Debug")
+		}
+
+		//Iterate all alerts in the payload, process and POST it to Line messenger.	
 		for _, alert := range payload.Alerts {
-			//fmt.Println(alert)
+
+			//Enable debug
+			if os.Getenv("debug") == "true" {
+				log.WithFields(log.Fields{
+					"Processed Payload": alert,
+				}).Info("Debug")
+			}
+
 			//Extract required info and assigned each var
 			ls := alert.Labels["alertname"]
 			fp := alert.Fingerprint
@@ -117,7 +131,7 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 				"ServerHTTPResponse": msgbody.Status,
 				"ServerHTTPMessage":  msgbody.Message,
 			}).Info("Response received.")
-			return
+			
 		}
 	default:
 		http.Error(w, "Method not Allowed", http.StatusMethodNotAllowed)
