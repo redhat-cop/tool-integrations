@@ -30,6 +30,9 @@ else:
     use_plugins = False
     plugin_directory = ""
 
+add_by_gitlab_group = "ADD_KEY_BY_GITLAB_GROUP" in os.environ and os.environ["ADD_KEY_BY_GITLAB_GROUP"] == "true"
+gitlab_group_url = ""
+
 application_template = Template("""apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -55,6 +58,13 @@ repository_config_template = Template("""- name: {{ RESOURCE_PREFIX }}-{{ RESOUR
   url: {{ REPO_URL }}
 """)
 
+group_config_template = Template("""- sshPrivateKeySecret:
+    key: sshPrivateKey
+    name: {{ SSH_SECRET_NAME }}
+  type: git
+  url: {{ GROUP_URL }}
+""")
+
 config.load_incluster_config()
 custom_object_api = client.CustomObjectsApi()
 config_map_api = client.CoreV1Api()
@@ -73,6 +83,9 @@ def main() -> None:
 
     g.auth()
     group = g.groups.get(gitlab_group)
+    global gitlab_group_url
+    gitlab_group_url = group.web_url + "/"
+    print(f"Looking for new projects in: {gitlab_group_url}")
     for group_project in group.projects.list(all=True, include_subgroups=True):
         project = g.projects.get(group_project.id, lazy=False)
         process_project(project, current_application_names)
@@ -156,26 +169,53 @@ def add_application_to_argo(project, application_data) -> None:
         body=application_data,
     )
 
-    # Edit ConfigMap to link the repo to an SSH secret
+    # Ensure Argo is configured to be able to access the repository
     config_map = config_map_api.read_namespaced_config_map(
         name=argo_configmap_name,
         namespace=argo_namespace,
     )
-    repository_config = repository_config_template.render(
-        RESOURCE_ID=project.id,
-        RESOURCE_PREFIX=resource_prefix,
-        REPO_URL=project.ssh_url_to_repo,
-        SSH_SECRET_NAME=ssh_secret_name,
-    )
-    if "repositories" in config_map.data.keys():
-        config_map.data['repositories'] += "\n" + repository_config
+    if add_by_gitlab_group:
+        modify_config_map = False
+        group_config = group_config_template.render(
+            GROUP_URL=gitlab_group_url,
+            SSH_SECRET_NAME=ssh_secret_name,
+        )
+        if "repository.credentials" in config_map.data.keys():
+            existing_credentials = yaml.load(config_map.data["repository.credentials"])
+            entry_exists = [element for element in existing_credentials if element["url"] == gitlab_group_url]
+            if len(entry_exists) == 0:
+                # Need to add group config
+                config_map.data["repository.credentials"] += "\n" + group_config
+                modify_config_map = True
+            else:
+                print("Not modifying Argo config - group credential already exists")
+        else:
+            # Need to add config key in the first place
+            config_map.data["repository.credentials"] = group_config
+            modify_config_map = True
+        if modify_config_map:
+            # Need to update the configmap with changes
+            config_map_api.patch_namespaced_config_map(
+                name=argo_configmap_name,
+                namespace=argo_namespace,
+                body=config_map,
+            )
     else:
-        config_map.data['repositories'] = repository_config
-    config_map_api.patch_namespaced_config_map(
-        name=argo_configmap_name,
-        namespace=argo_namespace,
-        body=config_map,
-    )
+        repository_config = repository_config_template.render(
+            RESOURCE_ID=project.id,
+            RESOURCE_PREFIX=resource_prefix,
+            REPO_URL=project.ssh_url_to_repo,
+            SSH_SECRET_NAME=ssh_secret_name,
+        )
+        if "repositories" in config_map.data.keys():
+            config_map.data['repositories'] += "\n" + repository_config
+        else:
+            config_map.data['repositories'] = repository_config
+        config_map_api.patch_namespaced_config_map(
+            name=argo_configmap_name,
+            namespace=argo_namespace,
+            body=config_map,
+        )
 
 
 main()

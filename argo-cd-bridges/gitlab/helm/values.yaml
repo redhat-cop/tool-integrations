@@ -40,3 +40,6 @@ argoConfigMapName: argocd-cm
 
 # The namespace you want Argo to deploy discovered Helm charts to (Application resources will always be created in the namespace Argo lives in)
 destinationNamespace: deploy-helm-charts-here
+
+# If true, adds one single SSH key to the Argo config to be used for all repositories in the GitLab group. Else, adds one key _per_ repository added.
+addKeyByGitLabGroup: true
