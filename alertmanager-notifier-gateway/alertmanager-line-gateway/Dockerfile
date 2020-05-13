@@ -1,14 +1,11 @@
-FROM golang:1.13
+FROM registry.access.redhat.com/ubi8/go-toolset:latest
 
 USER 1001
 
-RUN mkdir -p /go/src/github.com/redhat-cop/alertmanager-line-gateway
-WORKDIR /go/src/github.com/redhat-cop/alertmanager-line-gateway
+WORKDIR /opt/app-root/src
 
-COPY . /go/src/github.com/redhat-cop/alertmanager-line-gateway
-ENV GOCACHE=on
-ENV GO111MODULE=off
-ENV GOCACHE=/go/src/github.com/redhat-cop/alertmanager-line-gateway
+COPY  . /opt/app-root/src
+
 RUN go get
 RUN go build
 

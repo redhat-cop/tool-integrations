@@ -1,6 +1,6 @@
 # Telegram Notification Gateway #
 
-Line Notification Gateway for OpenShift Prometheus Alertmanager.
+Telegram Notification Gateway for OpenShift Prometheus Alertmanager.
 
 ## Installation ##
 

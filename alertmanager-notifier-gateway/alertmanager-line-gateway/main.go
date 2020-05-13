@@ -4,6 +4,7 @@ Comments: Implemented based on https://notify-bot.line.me/doc/en/.
 package main
 
 import (
+	"fmt"
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
@@ -62,9 +63,23 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 		//Read Authorization from alertmanager POST header to be reused.
 		a := r.Header.Get("Authorization")
 
-		//Iterate all alerts in the payload, process and POST it to Line messenger.
+		//Enable debug 
+		if os.Getenv("debug") == "true" {
+			log.WithFields(log.Fields{
+				"Total Payload": payload.Alerts,
+			}).Info("Debug")
+		}
+
+		//Iterate all alerts in the payload, process and POST it to Line messenger.	
 		for _, alert := range payload.Alerts {
-			//fmt.Println(alert)
+
+			//Enable debug
+			if os.Getenv("debug") == "true" {
+				log.WithFields(log.Fields{
+					"Processed Payload": alert,
+				}).Info("Debug")
+			}
+
 			//Extract required info and assigned each var
 			ls := alert.Labels["alertname"]
 			fp := alert.Fingerprint
@@ -73,8 +88,8 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 			am := alert.Annotations["message"]
 			sl := alert.Labels["severity"]
 
-			//Build up a data string
-			resp := "AlertName=" + ls + "\nSeverity=" + sl + "\nAlertStartsAt=" + at + "\nAlertStatus=" + as + "\nAlertMessage=" + am
+			//Build up a response data string from the alert received from alertmanager webhook payload.
+			resp := fmt.Sprintf("AlertName=%s\n Severity=%s\n AlertStartAt=%s\n AlertStatus=%s\n AlertMessage=%s\n", ls, sl, at, as, am)
 
 			//Create a value data that server will understand to be posted.
 			postData := url.Values{}
@@ -116,7 +131,7 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 				"ServerHTTPResponse": msgbody.Status,
 				"ServerHTTPMessage":  msgbody.Message,
 			}).Info("Response received.")
-			return
+			
 		}
 	default:
 		http.Error(w, "Method not Allowed", http.StatusMethodNotAllowed)
@@ -170,7 +185,9 @@ func main() {
 	http.HandleFunc("/webhook", webhook)
 	log.Info("Initialized /webhook handler")
 
+	// Check for environment settings for TLS or non-TLS startup.
 	if os.Getenv("insecure") == "false" {
+
 		if os.Getenv("tlscert") == "" {
 			log.Fatal("Missing TLS cert as tlscert env.")
 		}
@@ -179,16 +196,20 @@ func main() {
 			log.Fatal("Missing TLS key tlskey env.")
 		}
 
+		// Run the server in TLS mode with certificate and key location from enviroment settings.
 		log.Info("Serving TLS at 0.0.0.0:8443")
 		err := http.ListenAndServeTLS(":8443", os.Getenv("tlscert"), os.Getenv("tlskey"), nil)
 		if err != nil {
 			log.Fatal(err)
 		}
+		
 	} else {
+
 		log.Info("Serving at 0.0.0.0:8080")
 		err := http.ListenAndServe(":8080", nil)
 		if err != nil {
 			log.Fatal(err)
 		}
+
 	}
 }
