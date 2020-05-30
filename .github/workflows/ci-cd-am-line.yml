@@ -1,0 +1,29 @@
+---
+name: AlertManager Line Integration CI
+  
+on:
+  push:
+    branches: [ master ]
+    paths:
+    - alertmanager-notifier-gateway/alertmanager-line-gateway/*
+  pull_request:
+    branches: [ master ]
+    paths:
+    - alertmanager-notifier-gateway/alertmanager-line-gateway/*
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      
+    - name: Checkout
+      uses: actions/checkout@v2
+    
+    - uses: docker/build-push-action@v1
+      with:
+        path: alertmanager-notifier-gateway/alertmanager-line-gateway/
+        username: ${{ secrets.QUAY_USERNAME }}
+        password: ${{ secrets.QUAY_PASSWORD }}
+        repository: redhat-cop/alertmanager-line-gateway
+        registry: quay.io
+        tags: latest
