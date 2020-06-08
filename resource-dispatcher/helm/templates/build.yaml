@@ -23,9 +23,8 @@ spec:
   strategy:
     sourceStrategy:
       from:
-        kind: ImageStreamTag
-        name: {{ .Values.builderImage }}
-        namespace: openshift
+        kind: DockerImage 
+        name: "{{ .Values.builderImage }}"
     type: Source
   successfulBuildsHistoryLimit: 5
   triggers:
