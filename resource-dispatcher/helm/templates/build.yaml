@@ -1,0 +1,35 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    app: {{ include "app.fullname" . }}
+  name: {{ include "app.fullname" . }}
+spec:
+  failedBuildsHistoryLimit: 5
+  nodeSelector: {}
+  output:
+    to:
+      kind: ImageStreamTag
+      name: {{ include "app.fullname" . }}:latest
+  postCommit: {}
+  resources: {}
+  runPolicy: Serial
+  source:
+    git:
+      uri: {{ .Values.git.url }}
+      ref: {{ .Values.git.ref }}
+    contextDir: {{ .Values.git.path }}
+    type: Git
+  strategy:
+    sourceStrategy:
+      from:
+        kind: ImageStreamTag
+        name: {{ .Values.builderImage }}
+        namespace: openshift
+    type: Source
+  successfulBuildsHistoryLimit: 5
+  triggers:
+  - type: ImageChange
+  - type: ConfigChange
+status:
+  lastVersion: 0

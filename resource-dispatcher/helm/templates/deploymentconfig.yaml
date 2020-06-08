@@ -1,0 +1,78 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    app: {{ include "app.fullname" . }}
+  name: {{ include "app.fullname" . }}
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    deploymentconfig: {{ include "app.fullname" . }}
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      labels:
+        app: {{ include "app.fullname" . }}
+        deploymentconfig: {{ include "app.fullname" . }}
+    spec:
+      containers:
+      - env:
+        - name: CONFIG_FILE
+          value: /configs/config.yml
+        image: {{ include "app.fullname" . }}:latest
+        imagePullPolicy: Always
+        name: {{ include "app.fullname" . }}
+        ports:
+        - containerPort: 5000
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - name: config-volume
+          mountPath: /configs
+        {{- if .Values.sshSecretConfigMap }}
+        - name: ssh-secret-volume
+          mountPath: /sshSecret
+        {{- end }}
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: config-volume
+        configMap:
+          name: {{ .Values.configMapName }}
+      {{- if .Values.sshSecretConfigMap }}
+      - name: ssh-secret-volume
+        secret:
+          secretName: {{ .Values.sshSecretConfigMap }}
+      {{- end }}
+      {{- if .Values.giveClusterAdmin }}
+      serviceAccount: {{ include "app.fullname" . }}
+      serviceAccountName: {{ include "app.fullname" . }}
+      {{- else if .Values.specifyServiceAccount }}
+      serviceAccount: {{ .Values.serviceAccountName }}
+      serviceAccountName: {{ .Values.serviceAccountName }}
+      {{- end }}
+  triggers:
+  - type: ConfigChange
+  - type: ImageChange
+    imageChangeParams:
+      automatic: true
+      from:
+        kind: ImageStreamTag
+        name: {{ include "app.fullname" . }}:latest
+      containerNames:
+      - {{ include "app.fullname" . }}

@@ -1,0 +1,15 @@
+{{- if .Values.exposeRoute }}
+apiVersion: v1
+kind: Route
+metadata:
+  name: {{ include "app.fullname" . }}
+spec:
+  {{- if .Values.routeHost }}
+  host: {{ .Values.routeHost }}
+  {{- end }}
+  to:
+    kind: Service
+    name: {{ include "app.fullname" . }}
+  tls:
+    termination: edge
+{{- end }}
