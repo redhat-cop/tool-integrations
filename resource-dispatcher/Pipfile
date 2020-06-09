@@ -1,0 +1,19 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+schedule = "*"
+gitpython = "*"
+pyyaml = "*"
+flask = "*"
+ansible = "*"
+kubernetes = "*"
+inflect = "*"
+six = "*"
+
+[requires]
+python_version = "3.6"
