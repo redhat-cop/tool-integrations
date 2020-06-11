@@ -19,6 +19,7 @@ configFileContents: |
 
 configMapName: resource-dispatcher-config
 
-giveClusterAdmin: false
-specifyServiceAccount: false
-serviceAccount: ""
+setupClusterRoleBinding: false
+clusterRole: cluster-admin
+
+useServiceAccount: false

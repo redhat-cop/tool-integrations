@@ -59,12 +59,12 @@ spec:
         secret:
           secretName: {{ .Values.sshSecretConfigMap }}
       {{- end }}
-      {{- if .Values.giveClusterAdmin }}
+      {{- if .Values.setupClusterRoleBinding }}
       serviceAccount: {{ include "app.fullname" . }}
       serviceAccountName: {{ include "app.fullname" . }}
-      {{- else if .Values.specifyServiceAccount }}
-      serviceAccount: {{ .Values.serviceAccountName }}
-      serviceAccountName: {{ .Values.serviceAccountName }}
+      {{- else if .Values.useServiceAccount }}
+      serviceAccount: {{ .Values.useServiceAccount }}
+      serviceAccountName: {{ .Values.useServiceAccount }}
       {{- end }}
   triggers:
   - type: ConfigChange
