@@ -5,7 +5,6 @@ import os
 from multiprocessing import Process
 from copy import copy
 from execution.cd import cd
-from threading import Lock
 
 
 def initialize(task):
@@ -38,7 +37,6 @@ def run_task(task, context):
 
 def task_function(task, context):
 
-    @determine_concurrency_mode(task)
     @handle_errors(task)
     def fn():
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -100,28 +98,6 @@ def execute_step(fn, step, context):
             return True
         else:
             raise Exception("Error: Tried to loop over a non-iterable context object.")
-
-
-def determine_concurrency_mode(task):
-    if "enable_concurrency" in task and task["enable_concurrency"] is True:
-        def handle_concurrency(fn):
-            def enable_concurrency(*args, **kwargs):
-                fn(*args, **kwargs)
-            return enable_concurrency
-    else:
-        def handle_concurrency(fn):
-            mutex = Lock()
-
-            def restrict_concurrency(*args, **kwargs):
-                if mutex.acquire(False):
-                    try:
-                        return fn(*args, **kwargs)
-                    finally:
-                        mutex.release()
-                else:
-                    print("Task aborted - Another instance is already running and concurrency has not been enabled")
-            return restrict_concurrency
-    return handle_concurrency
 
 
 def handle_errors(task):
