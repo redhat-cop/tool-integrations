@@ -28,7 +28,6 @@ spec:
     type: Source
   successfulBuildsHistoryLimit: 5
   triggers:
-  - type: ImageChange
   - type: ConfigChange
 status:
   lastVersion: 0

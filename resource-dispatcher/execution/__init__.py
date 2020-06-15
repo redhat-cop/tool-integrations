@@ -1,11 +1,10 @@
 import tempfile
 import shutil
 import importlib
-import threading
 import os
+from multiprocessing import Process
 from copy import copy
 from execution.cd import cd
-from threading import Lock
 
 
 def initialize(task):
@@ -26,11 +25,20 @@ def initialize(task):
 
 
 def build_task(task):
+    def task_fn(context={}):
+        run_task(task, context=context)
+    return task_fn
 
-    @multithread
-    @determine_concurrency_mode(task)
+
+def run_task(task, context):
+    job_process = Process(target=task_function, args=(task, context))
+    job_process.start()
+
+
+def task_function(task, context):
+
     @handle_errors(task)
-    def task_function(context={}):
+    def fn():
         with tempfile.TemporaryDirectory() as temp_dir:
             for repository in [f.name for f in os.scandir("tmp") if f.is_dir()]:
                 shutil.copytree("tmp/" + repository, temp_dir + "/" + repository)
@@ -51,8 +59,7 @@ def build_task(task):
                     if (isinstance(result, bool) and result is False) or (isinstance(result, dict) and result["pass"] is False):
                         print("Step has broken execution - halting task")
                         break
-
-    return task_function
+    fn()
 
 
 def execute_step(fn, step, context):
@@ -91,35 +98,6 @@ def execute_step(fn, step, context):
             return True
         else:
             raise Exception("Error: Tried to loop over a non-iterable context object.")
-
-
-def multithread(fn):
-    def run_threaded(*args, **kwargs):
-        job_thread = threading.Thread(target=fn, args=args, kwargs=kwargs)
-        job_thread.start()
-    return run_threaded
-
-
-def determine_concurrency_mode(task):
-    if "enable_concurrency" in task and task["enable_concurrency"] is True:
-        def handle_concurrency(fn):
-            def enable_concurrency(*args, **kwargs):
-                fn(*args, **kwargs)
-            return enable_concurrency
-    else:
-        def handle_concurrency(fn):
-            mutex = Lock()
-
-            def restrict_concurrency(*args, **kwargs):
-                if mutex.acquire(False):
-                    try:
-                        return fn(*args, **kwargs)
-                    finally:
-                        mutex.release()
-                else:
-                    print("Task aborted - Another instance is already running and concurrency has not been enabled")
-            return restrict_concurrency
-    return handle_concurrency
 
 
 def handle_errors(task):
