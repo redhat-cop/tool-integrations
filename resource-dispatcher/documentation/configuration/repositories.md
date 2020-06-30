@@ -12,7 +12,10 @@ repositories:
       ssh_private_key: /my/path/to/an/ssh/key
   - name: automation-repo-2
     url: https://github.com/my-org/some-ansible-playbooks-2.git
+    ref: integration
 ```
+
+Both `ref` and `secret.ssh_private_key` are optional, to be used when a Git ref other than `master` is desired, or an SSH pull secret is required, respectively.
 
 Upon application startup, these repositories are cloned. They can be referenced from that point forward by their name as defined here, _not_ by any part of their Git URL.
 
