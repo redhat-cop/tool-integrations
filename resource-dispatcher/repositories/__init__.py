@@ -17,8 +17,9 @@ def configure_repository(repository):
 
     if not os.path.exists(repo_directory):
         os.makedirs(repo_directory)
+        ref = repository["ref"] if "ref" in repository else "master"
         print(f"Cloning {repository['url']}...")
-        repo = Repo.clone_from(repository["url"], repo_directory, branch="master", env=env)
+        repo = Repo.clone_from(repository["url"], repo_directory, branch=ref, env=env)
         print(f"Cloned {repository['url']}")
     else:
         repo = Repo.init(repo_directory)
