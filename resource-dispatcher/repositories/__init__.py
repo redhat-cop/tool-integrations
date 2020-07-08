@@ -15,17 +15,17 @@ def configure_repository(repository):
     else:
         env = {}
 
+    ref = repository["ref"] if "ref" in repository else "master"
     if not os.path.exists(repo_directory):
         os.makedirs(repo_directory)
-        ref = repository["ref"] if "ref" in repository else "master"
         print(f"Cloning {repository['url']}...")
         repo = Repo.clone_from(repository["url"], repo_directory, branch=ref, env=env)
         print(f"Cloned {repository['url']}")
     else:
         repo = Repo.init(repo_directory)
-        repo.remotes.origin.pull(env=env)
+        repo.remotes.origin.pull(ref, env=env)
 
-    schedule.every(2).minutes.do(__wrap_repo_pull(repo, env))
+    schedule.every(2).minutes.do(__wrap_repo_pull(repo, ref, env))
     print(f"Configured scheduler for pulling repository {repository['name']}")
 
 
@@ -37,9 +37,9 @@ def generate_ssh_command(repository):
         raise Exception("Git secret method not recognized.")
 
 
-def __wrap_repo_pull(repo, env):
+def __wrap_repo_pull(repo, ref, env):
 
     def pull():
-        repo.remotes.origin.pull(env=env)
+        repo.remotes.origin.pull(ref, env=env)
 
     return pull
