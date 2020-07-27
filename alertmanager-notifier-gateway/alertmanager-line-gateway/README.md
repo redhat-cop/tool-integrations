@@ -5,6 +5,11 @@ Line Notification Gateway for OpenShift Prometheus Alertmanager.
 ## Installation ##
 
 
+# Pre-Built Image
+```
+oc new-app quay.io/redhat-cop/alertmanager-line-gateway:latest
+```
+
 # S2I Stategy build
 
 ```

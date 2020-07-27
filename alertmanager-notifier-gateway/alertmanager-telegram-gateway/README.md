@@ -22,6 +22,14 @@ b. Chat ID
 
 Hence, your API Token is the "BOT_TOKEN" and Chat ID is "id".
 
+
+
+# Pre-Built Image
+```
+oc new-app quay.io/redhat-cop/alertmanager-telegram-gateway:latest
+```
+
+
 # S2I Stategy build
 
 ```
