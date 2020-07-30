@@ -6,6 +6,16 @@ metadata:
   name: {{ include "app.fullname" . }}
 spec:
   lookupPolicy:
-    local: true
+    local: false
+  tags:
+  - annotations: null
+    from:
+      kind: DockerImage
+      name: "{{ .Values.imageName }}:{{ .Values.imageTag }}"
+    importPolicy:
+      scheduled: true
+    name: {{ .Values.imageTag }}
+    referencePolicy:
+      type: Source
 status:
   dockerImageRepository: ""

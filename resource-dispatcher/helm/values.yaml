@@ -1,17 +1,9 @@
-##############
-# Build params
-##############
-
-git:
-  url: https://github.com/redhat-cop/tool-integrations.git
-  path: resource-dispatcher
-  ref: master
-
-builderImage: registry.access.redhat.com/ubi8/python-38:latest
-
 ################
 # Runtime params
 ################
+
+imageName: "quay.io/jacobsee/resource-dispatcher"
+imageTag: "latest"
 
 setupConfigMap: false
 configFileContents: |
