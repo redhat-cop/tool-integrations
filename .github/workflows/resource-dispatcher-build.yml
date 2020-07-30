@@ -1,0 +1,25 @@
+---
+
+name: Resource Dispatcher Build
+
+on:
+  push:
+    branches:
+    - master
+    paths:
+    - resource-dispatcher/**/*
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: redhat-cop/github-actions/s2i@v2
+      with:
+        path: resource-dispatcher
+        base: registry.access.redhat.com/ubi8/python-38:latest
+        output_image: "quay.io/redhat-cop/resource-dispatcher:${{ github.sha }}"
+        image_push_registry: quay.io
+        image_push_username: ${{ secrets.QUAY_RESOURCE_DISPATCHER_USERNAME }}
+        image_push_password: ${{ secrets.QUAY_RESOURCE_DISPATCHER_PASSWORD }}
+        image_tags: master
