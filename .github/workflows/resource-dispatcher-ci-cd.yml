@@ -29,7 +29,7 @@ jobs:
     - uses: redhat-cop/github-actions/s2i@v2
       with:
         path: argo-cd-bridges/gitlab
-        base: registry.access.redhat.com/rhscl/python-36-rhel7:latest
+        base: registry.access.redhat.com/ubi8/python-38:latest
         output_image: "quay.io/jacobsee/resource-dispatcher:${{ github.sha }}"
         image_push_registry: quay.io
         image_push_username: ${{ secrets.QUAY_USERNAME }}
