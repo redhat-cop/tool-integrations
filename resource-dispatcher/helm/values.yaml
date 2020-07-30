@@ -2,7 +2,7 @@
 # Runtime params
 ################
 
-imageName: "quay.io/jacobsee/resource-dispatcher"
+imageName: "quay.io/redhat-cop/resource-dispatcher"
 imageTag: "latest"
 
 setupConfigMap: false
