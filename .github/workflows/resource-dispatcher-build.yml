@@ -1,8 +1,6 @@
 ---
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Resource Dispatcher CI
+name: Resource Dispatcher Build
 
 on:
   push:
@@ -16,16 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python 3.7
-      uses: actions/setup-python@v1
-      with:
-        python-version: 3.7
-    # - name: Install dependencies
-    #   run: |
-    #     python -m pip install --upgrade pip
-    #     pip install pipenv
-    #     cd resource-dispatcher
-    #     pipenv install
     - uses: redhat-cop/github-actions/s2i@v2
       with:
         path: argo-cd-bridges/gitlab
@@ -34,3 +22,4 @@ jobs:
         image_push_registry: quay.io
         image_push_username: ${{ secrets.QUAY_USERNAME }}
         image_push_password: ${{ secrets.QUAY_PASSWORD }}
+        image_tags: master
