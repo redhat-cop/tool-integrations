@@ -16,7 +16,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: redhat-cop/github-actions/s2i@v2
       with:
-        path: argo-cd-bridges/gitlab
+        path: resource-dispatcher
         base: registry.access.redhat.com/ubi8/python-38:latest
         output_image: "quay.io/jacobsee/resource-dispatcher:${{ github.sha }}"
         image_push_registry: quay.io
