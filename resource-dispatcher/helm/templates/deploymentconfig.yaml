@@ -73,6 +73,6 @@ spec:
       automatic: true
       from:
         kind: ImageStreamTag
-        name: {{ .Values.name }}:{{ .Values.imageTag }}
+        name: {{ include "app.fullname" . }}:{{ .Values.imageTag }}
       containerNames:
       - {{ include "app.fullname" . }}
