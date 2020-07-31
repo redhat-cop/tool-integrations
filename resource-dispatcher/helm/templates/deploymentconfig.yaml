@@ -29,7 +29,7 @@ spec:
       - env:
         - name: CONFIG_FILE
           value: /configs/config.yml
-        image: {{ .Values.imageName }}:{{ .Values.imageTag }}
+        image: {{ include "app.fullname" . }}:{{ .Values.imageTag }}
         imagePullPolicy: Always
         name: {{ include "app.fullname" . }}
         ports:
