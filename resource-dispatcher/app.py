@@ -1,7 +1,9 @@
+from multiprocessing import Process
 from configuration import get_config
 from repositories import configure_repository
 from execution import build_task, initialize
 from triggering import configure_triggers, start
+from system_management import execute_supervised
 
 
 def main():
@@ -19,4 +21,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    execute_supervised(main)
