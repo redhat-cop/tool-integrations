@@ -6,11 +6,12 @@ Integration composition and triggering mechanism designed to take advantage of e
 
 ### <a name="hdiw"></a>How Does It Work?
 
-It takes a single configuration file containing:
+It takes a single configuration file (which is watched and live-reloaded) containing:
 
 * A number of tasks
 * A list of repositories that those tasks depend on
 * A set of triggers defining when those tasks should be run
+
 
 Here is simple workflow demonstrating all of these things:
 

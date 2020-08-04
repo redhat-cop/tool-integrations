@@ -1,4 +1,3 @@
-from multiprocessing import Process
 from configuration import get_config
 from repositories import configure_repository
 from execution import build_task, initialize
