@@ -1,0 +1,19 @@
+---
+
+name: Resource Dispatcher PR Build Check
+
+on:
+  pull_request:
+    paths:
+    - resource-dispatcher/**/*
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: vrutkovs/action-s2i@master
+      with:
+        path: resource-dispatcher
+        base: registry.access.redhat.com/ubi8/python-38:latest
+        image: resource-dispatcher:latest
