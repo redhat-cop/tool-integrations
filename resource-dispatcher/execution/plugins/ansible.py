@@ -8,8 +8,6 @@ from ansible.plugins.callback import CallbackBase
 from ansible import context
 import yaml
 import json
-import os
-import subprocess
 
 
 def process(ctx, params):
