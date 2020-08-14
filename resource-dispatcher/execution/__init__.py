@@ -68,9 +68,9 @@ def execute_step(fn, step, context):
     if loop_over is None:
         constructed_params = {}
         if "params_from_context" in step:
-            constructed_params.update(context[step["params_from_context"]])
+            deep_merge(constructed_params, context[step["params_from_context"]])
         if "params" in step:
-            constructed_params.update(step["params"])
+            deep_merge(constructed_params, step["params"])
         return fn(context, constructed_params)
     else:
         if isinstance(context[loop_over], list):
@@ -99,6 +99,20 @@ def execute_step(fn, step, context):
             return True
         else:
             raise Exception("Error: Tried to loop over a non-iterable context object.")
+
+
+def deep_merge(merge_into, merge_from, path=None):
+    if path is None: path = []
+    for key in merge_from:
+        if key in merge_into:
+            if isinstance(merge_from[key], dict) and isinstance(merge_into[key], dict):
+                deep_merge(merge_into[key], merge_from[key], path + [str(key)])
+            elif merge_into[key] == merge_from[key]:
+                pass
+            else:
+                raise Exception('Cannot merge dictionary with non-dictionary element: %s' % '.'.join(path + [str(key)]))
+        else:
+            merge_into[key] = merge_from[key]
 
 
 def handle_errors(task):
