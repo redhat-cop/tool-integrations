@@ -84,9 +84,9 @@ def execute_step(fn, step, context):
                 # Construct parameters for this run
                 constructed_params = {}
                 if "params_from_context" in step:
-                    constructed_params.update(context_copy[step["params_from_context"]])
+                    deep_merge(constructed_params, context_copy[step["params_from_context"]])
                 if "params" in step:
-                    constructed_params.update(step["params"])
+                    deep_merge(constructed_params, step["params"])
                 # Run step
                 fn(context_copy, constructed_params)
                 # Write (potentially) modified list element back to the loop_list
