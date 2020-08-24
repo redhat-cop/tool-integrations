@@ -5,3 +5,12 @@
   tasks:
   - debug: 
       msg: Hello, world!
+  - debug:
+      var: test_var
+    when: test_var is defined
+  - debug:
+      var: test_var_1
+    when: test_var_1 is defined
+  - debug:
+      var: test_var_2
+    when: test_var_2 is defined
