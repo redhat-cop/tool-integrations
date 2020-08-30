@@ -40,6 +40,9 @@ def generate_ssh_command(repository):
 def __wrap_repo_pull(repo, ref, env):
 
     def pull():
-        repo.remotes.origin.pull(ref, env=env)
+        try:
+            repo.remotes.origin.pull(ref, env=env)
+        except Exception as e:
+            print(f"ERROR: Could not fetch the latest copy of a repository ({e})")
 
     return pull
