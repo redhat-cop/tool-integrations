@@ -15,6 +15,7 @@ The Helm chart is available in `/helm` and has a few input parameters:
 | `sshSecretConfigMap` | The name of a secret containing an SSH key to be mounted at `/sshSecret/ssh-privatekey` (ignored if not set) | Not Set |
 | `exposeRoute` | Set to true to create an OCP route object | false |
 | `routeHost` | If `exposeRoute` is true, set this to explicitly set the host | Not Set |
+| `enableTriggeringConfigMap` | Name of a `ConfigMap` which contains a key `enable_triggering` set to `true` or `false`. If `false`, triggering via webook or the scheduler is disabled and the Resource Dispatcher will be "dormant". | Not Set |
 
 The Helm chart can be used as shown:
 

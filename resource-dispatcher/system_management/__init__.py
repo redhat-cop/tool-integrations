@@ -44,6 +44,10 @@ def execute_supervised(process):
         print("[System Management] Spawning new task engine")
         if "CONFIG_FILE" not in os.environ:
             sys.exit("Environment variable CONFIG_FILE must be defined or this application has nothing to do. Exiting.")
+        if "ENABLE_TRIGGERING" in os.environ and os.environ["ENABLE_TRIGGERING"].lower() == "false":
+            print("[System Management] Triggering is disabled by environment variable - halting here as the task engine has no work to do")
+            while True:
+                pass
         main_process = Process(target=process)
         main_process.start()
         main_job = main_process
