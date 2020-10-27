@@ -29,6 +29,13 @@ spec:
       - env:
         - name: CONFIG_FILE
           value: /configs/config.yml
+        {{- if .Values.enableTriggeringConfigMap }}
+        - name: ENABLE_TRIGGERING
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.enableTriggeringConfigMap }}
+              key: enable_triggering
+        {{- end }}
         image: {{ include "app.fullname" . }}:{{ .Values.imageTag }}
         imagePullPolicy: Always
         name: {{ include "app.fullname" . }}
