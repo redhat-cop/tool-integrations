@@ -27,9 +27,9 @@ def run_action(params):
     if params["action"] == "clone" or params["action"] == "pull":
         fetch(url, repo_directory, branch, env)
     elif params["action"] == "add-all-changes":
-        add_all(repo_directory)
+        add_all(url, repo_directory)
     elif params["action"] == "commit":
-        commit(repo_directory, message, author_name, author_email)
+        commit(url, repo_directory, message, author_name, author_email)
     elif params["action"] == "push":
         push(url, repo_directory, env)
 
@@ -48,24 +48,22 @@ def fetch(url, repo_directory, branch, env={}):
         repo.remotes.origin.pull(env=env)
 
 
-def add_all(repo_directory):
+def add_all(url, repo_directory):
     repo = Repo.init(repo_directory)
     repo.git.add(all=True)
-    print("All files added")
+    print(f"All files added: {url}")
 
 
-def commit(repo_directory, message, author_name, author_email):
+def commit(url, repo_directory, message, author_name, author_email):
     repo = Repo.init(repo_directory)
     repo.config_writer().set_value("user", "name", author_name).release()
     repo.config_writer().set_value("user", "email", author_email).release()
     try:
         repo.git.commit("-m", message, author=f"{author_name} <{author_email}>")
-        print("Committed to repository")
+        print(f"Committed to repository: {url}")
     except Exception as e:
-        if "nothing to commit, working tree clean" in str(e):
-            print("Nothing to commit")
-        elif "nothing to commit" in str(e):
-            print("Nothing to commit, empty repository?")
+        if "nothing to commit" in str(e):
+            print(f"Nothing to commit: {url}")
         else:
             raise e
 
@@ -74,6 +72,6 @@ def push(url, repo_directory, env={}):
     repo = Repo.init(repo_directory)
     try:
         repo.remotes.origin.push(env=env)
-        print("Pushed repository")
+        print(f"Pushed repository: {url}")
     except Exception as e:
         print(e)
