@@ -37,12 +37,17 @@ def run_action(params):
 def fetch(url, repo_directory, branch, env={}):
     if not os.path.exists(repo_directory):
         os.makedirs(repo_directory)
+        print(f"Cloning {url}...")
         try:
-            print(f"Cloning {url}...")
-            Repo.clone_from(url, repo_directory, branch=branch, env=env)
+            repo = Repo.clone_from(url, repo_directory, branch=branch, env=env)
             print(f"Cloned {url}")
-        except:
-            pass
+        except Exception as e:
+            if "not found in upstream origin" in str(e):
+                print(f"Branch {branch} not found: {url}")
+            elif "The project you were looking for could not be found" in str(e):
+                print(f"Project not found: {url}")
+            else:
+                raise e
     else:
         repo = Repo.init(repo_directory)
         repo.remotes.origin.pull(env=env)
@@ -69,9 +74,12 @@ def commit(url, repo_directory, message, author_name, author_email):
 
 
 def push(url, repo_directory, env={}):
-    repo = Repo.init(repo_directory)
     try:
+        repo = Repo.init(repo_directory)
         repo.remotes.origin.push(env=env)
         print(f"Pushed repository: {url}")
     except Exception as e:
-        print(e)
+        if "object has no attribute 'origin'" in str(e):
+            print(f"Remote origin does not exist: {url}")
+        else:
+            raise e
