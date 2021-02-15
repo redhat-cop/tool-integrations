@@ -12,7 +12,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: vrutkovs/action-s2i@master
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+    - name: Install Pipenv & Run Test
+      run: |
+        export PATH="$PATH:/home/runner/.local/bin"
+        python -m pip install --upgrade pip
+        pip install pipenv
+        cd resource-dispatcher
+        pipenv install
+        pipenv run pytest
+    - name: Build Image
+      uses: vrutkovs/action-s2i@master
       with:
         path: resource-dispatcher
         base: registry.access.redhat.com/ubi8/python-38:latest
