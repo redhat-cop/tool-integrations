@@ -42,7 +42,7 @@ def task_function(task, context):
         with tempfile.TemporaryDirectory() as temp_dir:
             if os.path.exists("tmp"):
                 for repository in [f.name for f in os.scandir("tmp") if f.is_dir()]:
-                    shutil.copytree("tmp/" + repository, temp_dir + "/" + repository)
+                    shutil.copytree("tmp/" + repository, temp_dir + "/" + repository, symlinks=True)
             with cd(temp_dir):
                 for step in task["steps"]:
                     # Load necessary execution plugin
