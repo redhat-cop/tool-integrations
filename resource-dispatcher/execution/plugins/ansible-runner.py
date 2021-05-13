@@ -8,7 +8,9 @@ def process(ctx, params):
     inventory_path = (
         params["inventory_path"] if "inventory_path" in params else "inventory/hosts"
     )
-    extra_vars = dict(ctx)
+    extra_vars = dict(
+        webhook_payload=ctx
+    )
     if "extra_vars" in params:
         extra_vars.update(params["extra_vars"])
         # Use the Python that we're running as by default, so dependencies are available
