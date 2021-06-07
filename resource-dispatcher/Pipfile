@@ -16,6 +16,7 @@ cryptography = ">=3.4"
 kubernetes = "*"
 inflect = "*"
 six = "*"
+pytz = "*"
 
 [requires]
 python_version = "3.8"
