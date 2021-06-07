@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: redhat-cop/github-actions/s2i@v2
+    - uses: redhat-cop/github-actions/s2i@v3
       with:
         path: resource-dispatcher
         base: registry.access.redhat.com/ubi8/python-38:latest
