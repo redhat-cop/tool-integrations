@@ -10,7 +10,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: tag with release version
-      uses: tinact/docker.image-retag@1.0.2
+      uses: tinact/docker.image-retag@1.0.3
       with:
         image_name: redhat-cop/resource-dispatcher
         image_old_tag: master
@@ -19,7 +19,7 @@ jobs:
         registry_username: ${{ secrets.QUAY_RESOURCE_DISPATCHER_USERNAME }}
         registry_password: ${{ secrets.QUAY_RESOURCE_DISPATCHER_PASSWORD }}
     - name: tag with latest
-      uses: tinact/docker.image-retag@1.0.2
+      uses: tinact/docker.image-retag@1.0.3
       with:
         image_name: redhat-cop/resource-dispatcher
         image_old_tag: ${{ github.sha }}
