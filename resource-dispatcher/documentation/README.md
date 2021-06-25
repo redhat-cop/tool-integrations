@@ -10,6 +10,7 @@
   * [Error Handling](configuration/error-handling.md)
 * Available Plugins
   * [Ansible](plugins/ansible.md)
+  * [Ansible Tower](plugins/ansible-tower.md)
   * [Git](plugins/git.md)
   * [Kubernetes](plugins/kubernetes.md)
   * [Script](plugins/script.md)
