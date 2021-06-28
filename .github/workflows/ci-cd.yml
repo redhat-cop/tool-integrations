@@ -37,7 +37,7 @@ jobs:
       run: |
         pip install pytest pytest-custom_exit_code
         pytest argo-cd-bridges/gitlab --suppress-no-test-exit-code
-    - uses: redhat-cop/github-actions/s2i@v2
+    - uses: redhat-cop/github-actions/s2i@v3
       with:
         path: argo-cd-bridges/gitlab
         base: registry.access.redhat.com/rhscl/python-36-rhel7:latest
