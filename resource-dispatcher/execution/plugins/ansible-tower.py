@@ -1,5 +1,7 @@
 import json
 import requests
+from common import deep_merge
+
 
 def process(ctx, params):
     towerVars = params
@@ -28,16 +30,3 @@ def process(ctx, params):
     if "extra_vars" in r.json()["ignored_fields"]:
         print("WARNING: Extra vars were specified, but Ansible Tower did not accept them. Ensure that \"Prompt for extra_vars\" is enabled on the job template.")
     print(f"Launched Ansible Tower job with ID: {r.json()['id']}")
-
-def deep_merge(merge_into, merge_from, path=None):
-    if path is None: path = []
-    for key in merge_from:
-        if key in merge_into:
-            if isinstance(merge_from[key], dict) and isinstance(merge_into[key], dict):
-                deep_merge(merge_into[key], merge_from[key], path + [str(key)])
-            elif merge_into[key] == merge_from[key]:
-                pass
-            else:
-                raise Exception('Cannot merge dictionary with non-dictionary element: %s' % '.'.join(path + [str(key)]))
-        else:
-            merge_into[key] = merge_from[key]
