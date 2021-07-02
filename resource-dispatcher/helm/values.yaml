@@ -15,3 +15,5 @@ setupClusterRoleBinding: false
 clusterRole: cluster-admin
 
 useServiceAccount: false
+
+useConfigDir: false
