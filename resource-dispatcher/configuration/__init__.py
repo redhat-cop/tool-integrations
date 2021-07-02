@@ -41,4 +41,5 @@ def get_config():
                     configuration["repositories"].extend(config_tmp["repositories"])
                 if "tasks" in config_tmp:
                     configuration["tasks"].extend(config_tmp["tasks"])
+                print(f"Loaded configuration file: {path}")
         return configuration
