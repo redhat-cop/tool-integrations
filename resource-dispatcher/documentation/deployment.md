@@ -1,6 +1,8 @@
 # Deployment
 
-This is fundamentally just a Python project that versions dependencies in `Pipenv` & `Pipenv.lock` files. Any system that can run projects using Pipenv should be able to run this application. If you are running this application standalone, you will need to set the environment variable `CONFIG_FILE` to the path of the config file to use. That said, there is a Helm chart available to get up and running quickly on OpenShift.
+This is fundamentally just a Python project that versions dependencies in `Pipenv` & `Pipenv.lock` files. Any system that can run projects using Pipenv should be able to run this application. If you are running this application standalone, you will need to set either the environment variable `CONFIG_FILE` to the path of the config file to use, or `CONFIG_DIR` to a directory of configuration YAML files to load.
+
+That said, there is a Helm chart available to get up and running quickly on OpenShift.
 
 The Helm chart is available in `/helm` and has a few input parameters:
 

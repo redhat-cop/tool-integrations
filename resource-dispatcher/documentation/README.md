@@ -5,6 +5,7 @@
   * [Repositories](configuration/repositories.md)
   * [Triggers](configuration/triggers.md)
   * [Steps & Parameters](configuration/steps-parameters.md)
+  * [Templating & Environment Vars](configuration/templating-env-vars.md)
   * [Context](configuration/context.md)
   * [Concurrency](configuration/concurrency.md)
   * [Error Handling](configuration/error-handling.md)
