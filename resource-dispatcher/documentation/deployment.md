@@ -1,8 +1,26 @@
 # Deployment
 
-This is fundamentally just a Python project that versions dependencies in `Pipenv` & `Pipenv.lock` files. Any system that can run projects using Pipenv should be able to run this application. If you are running this application standalone, you will need to set either the environment variable `CONFIG_FILE` to the path of the config file to use, or `CONFIG_DIR` to a directory of configuration YAML files to load.
+This is fundamentally just a Python project that versions dependencies in `Pipenv` & `Pipenv.lock` files. Any system that can run projects using Pipenv should be able to run this application.
 
-That said, there is a Helm chart available to get up and running quickly on OpenShift.
+## Configuration Modes
+
+This application can be run in two modes:
+
+### File Mode
+
+In file mode, one single file is used to configure all tasks and repositories. The environment variable `CONFIG_FILE` must be set to the path of a `.yml` or `.yaml` configuration file.
+
+### Directory Mode
+
+In directory mode, any number of configuration files can be used simultaneously to configure the application's behavior. The environment variable `CONFIG_DIR` must be set to a path containing one or more `.yml` or `.yaml` files. Any other files in the directory are ignored (with a log message), and the directory is not traversed recursively. Individual file exclusions are not supported, so this directory must contain _only_ YAML files intended for configuration of this application.
+
+There is no isolation between resources defined across configuration files; so repositories defined in one file are available for use by tasks in other, and name collisions (in tasks or repositories) will cause errors across config files. Additionally, multiple tasks (including across configuration files) are not allowed to bind to the same webhook trigger route.
+
+If any top-level objects other than `repositories` and `tasks` are defined in any YAML files, a warning will be written to the console, but execution will proceed if there are no other errors.
+
+## Kubernetes/OpenShift Deployment
+
+There is also a Helm chart available to get up and running quickly on a container platform.
 
 The Helm chart is available in `/helm` and has a few input parameters:
 
