@@ -41,6 +41,11 @@ spec:
               name: {{ .Values.enableTriggeringConfigMap }}
               key: enable_triggering
         {{- end }}
+        {{- if .Values.configMapAsEnvVars }}
+        envFrom:
+        - configMapRef:
+            name: {{ .Values.configMapAsEnvVars }}
+        {{- end }}
         image: {{ include "app.fullname" . }}:{{ .Values.imageTag }}
         imagePullPolicy: Always
         name: {{ include "app.fullname" . }}

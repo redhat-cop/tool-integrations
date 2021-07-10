@@ -30,6 +30,7 @@ The Helm chart is available in `/helm` and has a few input parameters:
 | `configFileContents` | The contents of the config file for `setupConfigMap` to create. | `""` |
 | `configMapName` | The pre-existing ConfigMap to use (if you don't use `setupConfigMap`) | `resource-dispatcher-config` |
 | `useConfigDir` | If true, will attempt to load all key-value pairs in the ConfigMap as configuration data. If false, will only load a key named `config.yml`. | `false` |
+| `configMapAsEnvVars` | Mounts a ConfigMap's key-value pairs as environment variables so that they can be templated into config files. Nothing mounted if set to `false`. | `false` |
 | `setupClusterRoleBinding` | Setup a `ClusterRoleBinding` to give the deployment privileges if you would like to use it to manage cluster resources. | `false` |
 | `clusterRole` | `ClusterRole` to bind to if `setupClusterRoleBinding` is `true`. | `cluster-admin` |
 | `useServiceAccount` | If you don't want to use `setupClusterRoleBinding` but you _do_ want to specify your own service account to run as, set this flag to the service account name. | `false` |

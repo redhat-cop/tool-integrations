@@ -17,3 +17,4 @@ clusterRole: cluster-admin
 useServiceAccount: false
 
 useConfigDir: false
+configMapAsEnvVars: false
