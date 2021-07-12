@@ -5,6 +5,7 @@ import os
 from multiprocessing import Process
 from copy import copy
 from execution.cd import cd
+from common import deep_merge
 
 
 def initialize(task):
@@ -99,20 +100,6 @@ def execute_step(fn, step, context):
             return True
         else:
             raise Exception("Error: Tried to loop over a non-iterable context object.")
-
-
-def deep_merge(merge_into, merge_from, path=None):
-    if path is None: path = []
-    for key in merge_from:
-        if key in merge_into:
-            if isinstance(merge_from[key], dict) and isinstance(merge_into[key], dict):
-                deep_merge(merge_into[key], merge_from[key], path + [str(key)])
-            elif merge_into[key] == merge_from[key]:
-                pass
-            else:
-                raise Exception('Cannot merge dictionary with non-dictionary element: %s' % '.'.join(path + [str(key)]))
-        else:
-            merge_into[key] = merge_from[key]
 
 
 def handle_errors(task):

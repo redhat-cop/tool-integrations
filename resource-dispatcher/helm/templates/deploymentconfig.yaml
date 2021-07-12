@@ -27,14 +27,24 @@ spec:
     spec:
       containers:
       - env:
+        {{- if .Values.useConfigDir }}
+        - name: CONFIG_DIR
+          value: /configs/
+        {{- else }}
         - name: CONFIG_FILE
           value: /configs/config.yml
+        {{- end }}
         {{- if .Values.enableTriggeringConfigMap }}
         - name: ENABLE_TRIGGERING
           valueFrom:
             configMapKeyRef:
               name: {{ .Values.enableTriggeringConfigMap }}
               key: enable_triggering
+        {{- end }}
+        {{- if .Values.configMapAsEnvVars }}
+        envFrom:
+        - configMapRef:
+            name: {{ .Values.configMapAsEnvVars }}
         {{- end }}
         image: {{ include "app.fullname" . }}:{{ .Values.imageTag }}
         imagePullPolicy: Always
