@@ -18,3 +18,5 @@ useServiceAccount: false
 
 useConfigDir: false
 configMapAsEnvVars: false
+
+resources: {}

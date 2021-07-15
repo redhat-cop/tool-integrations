@@ -52,7 +52,8 @@ spec:
         ports:
         - containerPort: 5000
           protocol: TCP
-        resources: {}
+        resources:
+        {{- toYaml .Values.resources | nindent 10 }}
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
