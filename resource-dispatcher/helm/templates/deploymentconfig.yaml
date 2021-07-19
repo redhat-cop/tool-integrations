@@ -12,7 +12,7 @@ spec:
   strategy:
     activeDeadlineSeconds: 21600
     resources:
-      {{- toYaml .Values.resources | nindent 6 }}
+    {{- toYaml .Values.resources | nindent 6 }}
     rollingParams:
       intervalSeconds: 1
       maxSurge: 25%
