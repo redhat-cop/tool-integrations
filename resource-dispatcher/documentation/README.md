@@ -9,6 +9,7 @@
   * [Context](configuration/context.md)
   * [Concurrency](configuration/concurrency.md)
   * [Error Handling](configuration/error-handling.md)
+  * [Debugging / Profiling](configuration/debugging.md)
 * Available Plugins
   * [Ansible](plugins/ansible.md)
   * [Ansible Tower](plugins/ansible-tower.md)

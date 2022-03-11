@@ -17,6 +17,7 @@ kubernetes = "*"
 inflect = "*"
 six = "*"
 pytz = "*"
+mem-top = "*"
 
 [requires]
 python_version = "3.8"
