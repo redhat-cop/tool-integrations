@@ -18,6 +18,7 @@ inflect = "*"
 six = "*"
 pytz = "*"
 mem-top = "*"
+psutil = "*"
 
 [requires]
 python_version = "3.8"
