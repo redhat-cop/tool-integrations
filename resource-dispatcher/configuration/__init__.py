@@ -30,7 +30,8 @@ def get_config():
     if mode == "dir":
         configuration = {
             "repositories": [],
-            "tasks": []
+            "tasks": [],
+            "debugging": {}
         }
         print(f"Looking for configuration files in directory: {os.environ['CONFIG_DIR']}")
         for file in os.listdir(os.environ["CONFIG_DIR"]):
@@ -51,7 +52,7 @@ def get_config():
 
 
 def config_merge(existing_config, new_config):
-    if "repositories" in new_config:
+    if "repositories" in new_config and new_config["repositories"] is not None:
         for repository in new_config["repositories"]:
             # Check if an _exact_ match has already been defined somewhere else
             if repository not in existing_config["repositories"]:
@@ -66,7 +67,7 @@ def config_merge(existing_config, new_config):
             # No else clause here - if the repository has already been defined with exactly
             # the same characteristics, we don't really have a problem.
             # Just ignore the second one.
-    if "tasks" in new_config:
+    if "tasks" in new_config and new_config["tasks"] is not None:
         for task in new_config["tasks"]:
             if task["name"] in [existing_task["name"] for existing_task in existing_config["tasks"]]:
                 raise Exception(f"A task named {task['name']} has already been defined. Cannot proceed with configuration.")
@@ -78,11 +79,16 @@ def config_merge(existing_config, new_config):
             if intersection:
                 raise Exception(f"A webhook route collision has been detected. Cannot proceed with configuration: {intersection}")
             existing_config["tasks"].append(task)
+    if "debugging" in new_config and new_config["debugging"] is not None:
+        for key in new_config["debugging"]:
+            if key in existing_config["debugging"]:
+                raise Exception(f"A debugging key '{key}' has been defined more than once. Cannot proceed with configuration.")
+            existing_config["debugging"][key] = new_config["debugging"][key]
 
 
 def config_structure_warnings(filename, config):
     keys_defined = set(config.keys())
-    keys_understood = {"repositories", "tasks"}
+    keys_understood = {"repositories", "tasks", "debugging"}
     extra_keys = keys_defined.difference(keys_understood)
     if len(extra_keys):
         print(f"Warning: Fields defined in configuration file but not used: {extra_keys}")
