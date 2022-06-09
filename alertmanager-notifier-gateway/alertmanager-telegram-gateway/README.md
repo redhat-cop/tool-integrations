@@ -13,8 +13,11 @@ b. Chat ID
 1. Create telegram bot via [BotFather](https://core.telegram.org/bots#6-botfather).
 2. Using BotFather get the [token](https://www.siteguarding.com/en/how-to-get-telegram-bot-api-token).
 3. Get the chat ID ( you must send some test message to the bot before run this step). Fetch the chat ID using (note the "id" section):
+
+Notice the "bot" in front of the token, this is a must for this call to work properly.  
 ```
-#curl https://api.telegram.org/<BOT_TOKEN>/getUpdates
+
+#curl https://api.telegram.org/bot<BOT_TOKEN>/getUpdates
 
 {"ok":true,"result":[{"update_id":502830325,
 "message":{"message_id":3,"from":{"id":962xxxx,"is_bot":false,"first_name":"John","last_name":"Doe","language_code":"en"},"chat":{"id":962xxxx,"first_name":"John","last_name":"Doe","type":"private"},"date":1587444744,"text":"hello"}}]}
